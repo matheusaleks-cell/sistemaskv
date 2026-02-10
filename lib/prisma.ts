@@ -4,6 +4,7 @@ import pg from 'pg'
 
 const prismaClientSingleton = () => {
     const connectionString = process.env.DIRECT_URL
+    console.log('Initializing Prisma with connection string (length):', connectionString?.length);
     const pool = new pg.Pool({ connectionString })
     const adapter = new PrismaPg(pool)
     return new PrismaClient({ adapter })

@@ -3,14 +3,16 @@
 import prisma from '@/lib/prisma'
 
 export async function loginAction(email: string, password?: string) {
+    console.log('Login attempt for:', email);
     try {
         const user = await prisma.user.findUnique({
             where: { email },
         })
 
+        console.log('User found in DB:', user ? 'Yes' : 'No');
+
         if (user && user.password === password) {
-            // In a real app, you'd set a cookie here or use NextAuth
-            // For now, we'll just return the user data to the client store
+            console.log('Login successful for:', email);
             return {
                 success: true,
                 user: {
@@ -22,9 +24,10 @@ export async function loginAction(email: string, password?: string) {
             }
         }
 
+        console.log('Login failed: Invalid credentials');
         return { success: false, error: 'Credenciais inválidas' }
     } catch (error) {
-        console.error('Login error:', error)
+        console.error('Login error in server action:', error)
         return { success: false, error: 'Erro no servidor' }
     }
 }
