@@ -5,7 +5,8 @@ import { useAppStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { CheckCircle2, User, KeyRound } from "lucide-react"
+import { CheckCircle2, User, KeyRound, Bug } from "lucide-react"
+import { testDatabaseConnection } from "@/lib/actions/debug"
 
 export function LoginPage() {
     const { login } = useAppStore()
@@ -13,6 +14,14 @@ export function LoginPage() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
+    const [debugMode, setDebugMode] = useState(false)
+    const [debugResult, setDebugResult] = useState<any>(null)
+
+    const runDebug = async () => {
+        setDebugMode(true)
+        const result = await testDatabaseConnection()
+        setDebugResult(result)
+    }
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -120,7 +129,7 @@ export function LoginPage() {
                             className="text-left cursor-pointer p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-800 group"
                             onClick={() => {
                                 setEmail('wiliam@grafica.com')
-                                setPassword('12345')
+                                setPassword('Jojo!246040')
                             }}
                         >
                             <p className="font-bold text-xs text-orange-400 mb-0.5">Wiliam</p>
@@ -130,13 +139,36 @@ export function LoginPage() {
                             className="text-left cursor-pointer p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-800 group"
                             onClick={() => {
                                 setEmail('amanda@atendimento.com')
-                                setPassword('12345')
+                                setPassword('Jojo!246040')
                             }}
                         >
                             <p className="font-bold text-xs text-blue-400 mb-0.5">Amanda</p>
                             <p className="text-[10px] text-slate-500 group-hover:text-slate-300 transition-colors">amanda@atendimento.com</p>
                         </div>
                     </div>
+
+                    {/* Debug Button */}
+                    <div className="pt-4">
+                        <Button
+                            type="button"
+                            onClick={runDebug}
+                            className="w-full h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold text-xs rounded-xl"
+                        >
+                            <Bug className="mr-2 h-4 w-4" /> Testar Conexão com Banco
+                        </Button>
+                    </div>
+
+                    {/* Debug Result */}
+                    {debugMode && debugResult && (
+                        <div className={`mt-4 p-4 rounded-xl border text-left ${debugResult.success ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-red-500/10 border-red-500/50'}`}>
+                            <p className={`font-bold text-sm mb-2 ${debugResult.success ? 'text-emerald-400' : 'text-red-400'}`}>
+                                {debugResult.success ? '✅ Conexão OK' : '❌ Erro de Conexão'}
+                            </p>
+                            <pre className="text-xs text-slate-300 overflow-auto max-h-40 bg-black/30 p-2 rounded">
+                                {JSON.stringify(debugResult, null, 2)}
+                            </pre>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
