@@ -5,12 +5,21 @@ import { StatCards } from "@/components/dashboard/StatCards"
 import { ActivityChart } from "@/components/dashboard/ActivityChart"
 import { useAppStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
-import { Plus, FileText, Printer, Users } from "lucide-react"
+import { Plus, FileText, Printer, Users, Bug } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { testDatabaseConnection } from "@/lib/actions/debug"
+import { useState } from "react"
 
 export default function Home() {
   const { currentUser, orders } = useAppStore()
   const router = useRouter()
+  const [debugResult, setDebugResult] = useState<any>(null)
+
+  const runDebug = async () => {
+    const result = await testDatabaseConnection()
+    setDebugResult(result)
+    alert(JSON.stringify(result, null, 2))
+  }
 
   // Calculate real stats
   const stats = {
@@ -37,6 +46,9 @@ export default function Home() {
             </Button>
             <Button onClick={() => router.push('/clients')} variant="outline" size="lg" className="bg-transparent border-white/30 text-white hover:bg-white/10 font-bold rounded-2xl px-8 h-14">
               <Users className="mr-2 h-5 w-5" /> Ver Clientes
+            </Button>
+            <Button onClick={runDebug} variant="outline" size="lg" className="bg-red-500/20 border-red-500/50 text-white hover:bg-red-500/30 font-bold rounded-2xl px-8 h-14">
+              <Bug className="mr-2 h-5 w-5" /> Debug DB
             </Button>
           </div>
         </div>
