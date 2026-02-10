@@ -3,8 +3,9 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
 const prismaClientSingleton = () => {
-    const connectionString = process.env.DIRECT_URL
-    console.log('Initializing Prisma with connection string (length):', connectionString?.length);
+    // Use DATABASE_URL (pooler) for serverless environments like Netlify
+    const connectionString = process.env.DATABASE_URL
+    console.log('Initializing Prisma with DATABASE_URL (pooler), length:', connectionString?.length);
     const pool = new pg.Pool({ connectionString })
     const adapter = new PrismaPg(pool)
     return new PrismaClient({ adapter })
