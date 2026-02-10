@@ -3,10 +3,17 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
 const prismaClientSingleton = () => {
-    // Use DATABASE_URL (pooler) for serverless environments like Netlify
-    const connectionString = process.env.DATABASE_URL
-    console.log('Initializing Prisma with DATABASE_URL (pooler), length:', connectionString?.length);
-    const pool = new pg.Pool({ connectionString })
+    // Use DIRECT_URL with limited connections for serverless
+    const connectionString = process.env.DIRECT_URL
+    console.log('Initializing Prisma with DIRECT_URL for serverless, length:', connectionString?.length);
+
+    const pool = new pg.Pool({
+        connectionString,
+        max: 1, // Limit connections for serverless
+        idleTimeoutMillis: 10000,
+        connectionTimeoutMillis: 10000,
+    })
+
     const adapter = new PrismaPg(pool)
     return new PrismaClient({ adapter })
 }
