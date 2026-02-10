@@ -1,8 +1,14 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+const { PrismaClient } = require('@prisma/client')
+const { PrismaPg } = require('@prisma/adapter-pg')
+const { Pool } = require('pg')
+require('dotenv').config()
 
 async function main() {
+    const connectionString = process.env.DIRECT_URL
+    const pool = new Pool({ connectionString })
+    const adapter = new PrismaPg(pool)
+    const prisma = new PrismaClient({ adapter })
+
     const users = [
         {
             name: 'Wiliam',
@@ -18,7 +24,7 @@ async function main() {
         }
     ]
 
-    console.log('Seeding users...')
+    console.log('Seeding users into Supabase...')
     for (const user of users) {
         const upserted = await prisma.user.upsert({
             where: { email: user.email },
@@ -27,13 +33,9 @@ async function main() {
         })
         console.log(`- ${upserted.name} (${upserted.email})`)
     }
+
+    await prisma.$disconnect()
+    await pool.end()
 }
 
-main()
-    .catch((e) => {
-        console.error(e)
-        process.exit(1)
-    })
-    .finally(async () => {
-        await prisma.$disconnect()
-    })
+main().catch(console.error)
