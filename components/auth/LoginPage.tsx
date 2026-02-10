@@ -14,19 +14,16 @@ export function LoginPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError(false)
 
-        // Simulate network delay for effect
-        setTimeout(() => {
-            if (!login(email, password)) {
-                setError(true)
-                setLoading(false)
-            }
-            // If success, the store updates and layout re-renders automatically
-        }, 800)
+        const success = await login(email, password)
+        if (!success) {
+            setError(true)
+            setLoading(false)
+        }
     }
 
     return (

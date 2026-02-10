@@ -14,9 +14,9 @@ interface AppState {
     settings: SystemSettings;
 
     // Actions
-    login: (email: string, password?: string) => boolean;
+    login: (email: string, password?: string) => Promise<boolean>;
     logout: () => void;
-    updatePassword: (userId: string, newPassword: string) => void;
+    updatePassword: (userId: string, newPassword: string) => Promise<boolean>;
 
     addClient: (client: Omit<Client, 'id' | 'createdAt'>) => void;
     updateClient: (id: string, data: Partial<Client>) => void;
@@ -84,21 +84,37 @@ export const useAppStore = create<AppState>()(
                 enableQualityChecklist: false,
             },
 
-            login: (email, password) => {
-                const user = get().users.find(u => u.email === email && u.password === password);
-                if (user) {
-                    set({ currentUser: user });
-                    return true;
+            login: async (email, password) => {
+                try {
+                    const { loginAction } = await import('@/lib/actions/auth');
+                    const result = await loginAction(email, password);
+
+                    if (result.success && result.user) {
+                        set({ currentUser: result.user as User });
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Login store error:', error);
+                    return false;
                 }
-                return false;
             },
 
             logout: () => set({ currentUser: null }),
 
-            updatePassword: (userId, newPassword) => set(state => ({
-                users: state.users.map(u => u.id === userId ? { ...u, password: newPassword } : u),
-                currentUser: state.currentUser?.id === userId ? { ...state.currentUser, password: newPassword } : state.currentUser
-            })),
+            updatePassword: async (userId, newPassword) => {
+                const { updatePasswordAction } = await import('@/lib/actions/auth');
+                const result = await updatePasswordAction(userId, newPassword);
+
+                if (result.success) {
+                    set(state => ({
+                        users: state.users.map(u => u.id === userId ? { ...u, password: newPassword } : u),
+                        currentUser: state.currentUser?.id === userId ? { ...state.currentUser, password: newPassword } : state.currentUser
+                    }));
+                    return true;
+                }
+                return false;
+            },
 
             addClient: (clientData) => set((state) => ({
                 clients: [...state.clients, { ...clientData, id: uuidv4(), createdAt: new Date().toISOString() }]
