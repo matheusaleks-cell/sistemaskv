@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String   @default("12345")
+  role      String   // MASTER, ATTENDANT, PRODUCTION
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id          String   @id @default(uuid())
+  name        String
+  document    String?
+  email       String?
+  phone       String?
+  origin      String?
+  type        String   @default("PF") // PF or PJ
+  createdAt   DateTime @default(now())
+  orders      Order[]
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  osNumber        String?     @unique
+  clientId        String
+  client          Client      @relation(fields: [clientId], references: [id])
+  clientName      String
+  total           Float
+  status          String      // QUOTE, APPROVED, PRODUCTION, COMPLETED, DELIVERED, CANCELLED
+  items           OrderItem[]
+  createdAt       DateTime    @default(now())
+  validUntil      DateTime?
+  productionStart DateTime?
+  deadline        DateTime?
+  finishedAt      DateTime?
+  hasShipping     Boolean     @default(false)
+  shippingAddress String?
+  shippingValue   Float?      @default(0)
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   String?
+  productName String
+  width       Float
+  height      Float
+  quantity    Int
+  unitPrice   Float
+  totalPrice  Float
+  finish      String?
+  costs       Json?    // Stores the detailed cost breakdown
+}
+
+model FinancialRecord {
+  id          String   @id @default(uuid())
+  type        String   // PAYABLE, RECEIVABLE
+  description String
+  amount      Float
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      String   // PENDING, PAID, CANCELLED
+  category    String?
+  orderId     String?
+  createdAt   DateTime @default(now())
+}
+
+model Log {
+  id        String   @id @default(uuid())
+  date      DateTime @default(now())
+  action    String
+  details   String
+  userId    String
+  userName  String
+}
