@@ -1,42 +1,66 @@
 'use server'
 
-import prisma from '@/lib/prisma'
+import { PrismaClient } from '@prisma/client'
 
 export async function testDatabaseConnection() {
-    console.log('--- DEBUG: Testing DB Connection from Server Action ---');
-    try {
-        // 1. Check if environment variables are present
-        const hasDirectUrl = !!process.env.DIRECT_URL;
-        const directUrlLength = process.env.DIRECT_URL?.length || 0;
+    console.log('--- DEBUG: Advanced Connection Test ---');
 
-        console.log(`DIRECT_URL present: ${hasDirectUrl}, length: ${directUrlLength}`);
+    const results = {
+        steps: [] as string[],
+        success: false,
+        message: '',
+        workingUrlType: ''
+    };
 
-        // 2. Try a simple query
-        const start = Date.now();
-        const userCount = await prisma.user.count();
-        const duration = Date.now() - start;
+    const tryConnection = async (name: string, url: string) => {
+        results.steps.push(`Testing ${name}... URL Present: ${!!url}`);
+        if (!url) {
+            results.steps.push(`❌ ${name}: URL not defined`);
+            return false;
+        }
 
-        console.log(`Query successful. User count: ${userCount}. Duration: ${duration}ms`);
-
-        return {
-            success: true,
-            message: 'Conexão com banco de dados OK!',
-            details: {
-                userCount,
-                duration: `${duration}ms`,
-                envCheck: hasDirectUrl ? 'DIRECT_URL configurada' : 'ERRO: DIRECT_URL ausente'
-            }
-        };
-    } catch (error: any) {
-        console.error('--- DEBUG: DB Connection Failed ---');
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-
-        return {
-            success: false,
-            message: 'Falha na conexão com o banco de dados',
-            error: error.message,
-            code: error.code || 'UNKNOWN'
-        };
+        try {
+            const client = new PrismaClient({
+                datasources: { db: { url } }
+            });
+            const count = await client.user.count();
+            await client.$disconnect();
+            results.steps.push(`✅ ${name}: SUCCESS! Count: ${count}`);
+            return true;
+        } catch (e: any) {
+            results.steps.push(`❌ ${name}: Failed. Error: ${e.message}`);
+            return false;
+        }
     }
+
+    // 1. Test configured DATABASE_URL (Transaction Pooler - 6543)
+    const dbUrl = process.env.DATABASE_URL || '';
+    if (await tryConnection('DATABASE_URL (Transaction Mode)', dbUrl)) {
+        return { success: true, message: 'DATABASE_URL connected successfully!', workingUrlType: 'DATABASE_URL', steps: results.steps };
+    }
+
+    // 2. Test configured DIRECT_URL (Direct Mode - 5432)
+    const directUrl = process.env.DIRECT_URL || '';
+    if (await tryConnection('DIRECT_URL (Direct Mode)', directUrl)) {
+        return { success: true, message: 'DIRECT_URL connected successfully!', workingUrlType: 'DIRECT_URL', steps: results.steps };
+    }
+
+    // 3. Construct Session Mode
+    try {
+        const poolerHost = 'aws-0-sa-east-1.pooler.supabase.com';
+        const pass = 'Jojo%21246040'; // Escaped password
+        const sessionUrl = `postgresql://postgres.ptjvgmgivptnxmmsupot:${pass}@${poolerHost}:5432/postgres`;
+
+        if (await tryConnection('Session Mode (Pooler Host:5432)', sessionUrl)) {
+            return { success: true, message: 'Session Mode connected successfully!', workingUrlType: 'SESSION_MODE', steps: results.steps };
+        }
+    } catch (e) {
+        results.steps.push('Failed to construct session URL');
+    }
+
+    return {
+        success: false,
+        message: 'All connection attempts failed.',
+        steps: results.steps
+    };
 }
