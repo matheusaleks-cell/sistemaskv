@@ -1,9 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 
 const prismaClientSingleton = () => {
-    // A configuração de conexão será lida automaticamente do process.env.DATABASE_URL
-    // e do process.env.DIRECT_URL. Não precisamos sobrescrever aqui.
-    return new PrismaClient()
+    // Prisma 7 requires explicit connection string configuration since schema won't have it
+    const connectionString = process.env.DATABASE_URL
+    return new PrismaClient({
+        // @ts-ignore - 'datasources' is valid for overriding connection string
+        datasources: {
+            db: {
+                url: connectionString
+            }
+        }
+    })
 }
 
 declare global {
