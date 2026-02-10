@@ -3,15 +3,15 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
 const prismaClientSingleton = () => {
-    // Use DIRECT_URL with limited connections for serverless
-    const connectionString = process.env.DIRECT_URL
-    console.log('Initializing Prisma with DIRECT_URL for serverless, length:', connectionString?.length);
+    // Use Session Pooler (port 5432) for IPv4 compatibility and Direct mode behavior
+    const connectionString = process.env.DATABASE_URL
+    console.log('Initializing Prisma with Session Pooler, length:', connectionString?.length);
 
     const pool = new pg.Pool({
         connectionString,
-        max: 1, // Limit connections for serverless
-        idleTimeoutMillis: 10000,
-        connectionTimeoutMillis: 10000,
+        max: 10, // Reasonable limit for session pooler
+        idleTimeoutMillis: 20000,
+        connectionTimeoutMillis: 5000,
     })
 
     const adapter = new PrismaPg(pool)
