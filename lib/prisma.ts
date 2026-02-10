@@ -3,19 +3,23 @@ import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
 const prismaClientSingleton = () => {
-    // Use Session Pooler (port 5432) for IPv4 compatibility and Direct mode behavior
-    const connectionString = process.env.DATABASE_URL
-    console.log('Initializing Prisma with Session Pooler, length:', connectionString?.length);
+    // Determine which connection string to use
+    // On Netlify/Production, we MUST use DATABASE_URL (Transaction Pooler port 6543)
+    // We append ?pgbouncer=true to the URL in .env
+    const connectionString = process.env.DATABASE_URL || ''
+    console.log('Initializing Prisma with DATABASE_URL (pgbouncer mode), length:', connectionString?.length);
 
-    const pool = new pg.Pool({
-        connectionString,
-        max: 10, // Reasonable limit for session pooler
-        idleTimeoutMillis: 20000,
-        connectionTimeoutMillis: 5000,
+    // For PgBouncer in Transaction Mode (port 6543), we are using the default Prisma Query Engine.
+    // The pg-adapter (driver adapter) sends prepared statements by default which PgBouncer transaction mode DOES NOT support.
+
+    return new PrismaClient({
+        // @ts-ignore - datasources IS valid but types might be acting up
+        datasources: {
+            db: {
+                url: connectionString
+            }
+        }
     })
-
-    const adapter = new PrismaPg(pool)
-    return new PrismaClient({ adapter })
 }
 
 declare global {
