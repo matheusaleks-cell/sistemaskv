@@ -72,13 +72,17 @@ export default function QuotesPage() {
                                                 quote.status === 'PRODUCTION' ? 'warning' :
                                                     quote.status === 'COMPLETED' ? 'success' : 'outline'
                                     }>
-                                        {quote.status}
+                                        {quote.status === 'QUOTE' ? 'ORÇAMENTO' :
+                                            quote.status === 'APPROVED' ? 'APROVADO' :
+                                                quote.status === 'PRODUCTION' ? 'EM PRODUÇÃO' :
+                                                    quote.status === 'COMPLETED' ? 'FINALIZADO' :
+                                                        quote.status === 'DELIVERED' ? 'ENTREGUE' : quote.status}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">R$ {quote.total.toFixed(2)}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="sm" asChild>
-                                        <Link href={`/quotes/${quote.id}`}>Ver</Link>
+                                    <Button variant="ghost" size="sm" onClick={() => window.location.href = `/quotes/${quote.id}`}>
+                                        Ver
                                     </Button>
                                 </TableCell>
                             </TableRow>

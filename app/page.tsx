@@ -25,7 +25,10 @@ export default function Home() {
   const stats = {
     quotes: orders.filter(o => o.status === 'QUOTE').length,
     production: orders.filter(o => ['APPROVED', 'PRODUCTION'].includes(o.status)).length,
-    completed: orders.filter(o => o.status === 'COMPLETED').length
+    completed: orders.filter(o => o.status === 'COMPLETED').length,
+    revenue: currentUser?.role === 'MASTER'
+      ? orders.filter(o => o.status !== 'QUOTE').reduce((acc, curr) => acc + curr.total, 0)
+      : undefined
   }
 
   return (

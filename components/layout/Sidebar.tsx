@@ -11,7 +11,8 @@ import {
     LogOut,
     Printer,
     Package,
-    Calculator
+    Calculator,
+    ClipboardList
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -71,6 +72,12 @@ export function Sidebar() {
                 color: "text-emerald-400 group-hover:text-emerald-300",
             })
         }
+        routes.push({
+            label: "Logs de Sistema",
+            icon: ClipboardList,
+            href: "/logs",
+            color: "text-rose-400 group-hover:text-rose-300",
+        });
         routes.push({
             label: "Configurações",
             icon: Settings,

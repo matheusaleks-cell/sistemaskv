@@ -93,14 +93,24 @@ export function ProductionList() {
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 border-emerald-200"
-                                            onClick={() => handleComplete(order.id)}
-                                        >
-                                            <CheckCircle className="mr-2 h-4 w-4" /> Concluir
-                                        </Button>
+                                        <div className="flex justify-end gap-2">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="text-slate-500 hover:text-slate-700"
+                                                onClick={() => window.location.href = `/quotes/${order.id}`}
+                                            >
+                                                Ver
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 border-emerald-200"
+                                                onClick={() => handleComplete(order.id)}
+                                            >
+                                                <CheckCircle className="mr-2 h-4 w-4" /> Concluir
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))

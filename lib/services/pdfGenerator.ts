@@ -1,7 +1,15 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Order, Client } from '@/types';
+import { Order, Client, OrderStatus } from '@/types';
 import { format } from 'date-fns';
+
+const STATUS_LABELS: Record<OrderStatus, string> = {
+    QUOTE: 'ORÇAMENTO',
+    APPROVED: 'APROVADO',
+    PRODUCTION: 'EM PRODUÇÃO',
+    COMPLETED: 'FINALIZADO',
+    DELIVERED: 'ENTREGUE'
+};
 
 const addSignatures = (doc: jsPDF, finalY: number) => {
     const pageHeight = doc.internal.pageSize.height;
@@ -17,25 +25,32 @@ const addSignatures = (doc: jsPDF, finalY: number) => {
     doc.text("Responsável SKV", 158, y + 5, { align: "center" });
 };
 
-const drawLogo = (doc: jsPDF, x: number, y: number) => {
-    // Background rectangle for the logo
-    doc.setFillColor(249, 115, 22); // Orange
-    doc.roundedRect(x, y, 20, 20, 4, 4, 'F');
+const drawLogo = (doc: jsPDF, x: number, y: number, isDark: boolean = false) => {
+    // Premium SKV Logo Construction
+    // Horizontal Layout: [Diamond Icon] SKV Flow
 
-    // Logo Text "S"
-    doc.setTextColor(255, 255, 255); // White
-    doc.setFontSize(32);
+    // 1. Diamond Icon (Orange)
+    doc.setFillColor(249, 115, 22); // Orange primary
+    doc.triangle(x, y + 5, x + 5, y, x + 10, y + 5, 'F');
+    doc.triangle(x, y + 5, x + 5, y + 10, x + 10, y + 5, 'F');
+
+    // 2. SKV Text
+    doc.setTextColor(isDark ? 255 : 30, isDark ? 255 : 41, isDark ? 255 : 59);
+    doc.setFontSize(22);
     doc.setFont("helvetica", "bold");
-    doc.text("S", x + 10, y + 14, { align: "center" });
+    doc.text("SKV", x + 15, y + 8);
 
-    // Company Name beside it
-    doc.setTextColor(30, 41, 59); // Dark slate
-    doc.setFontSize(24);
-    doc.text("SKV", x + 25, y + 12);
+    // 3. Flow or Subtext
+    doc.setTextColor(249, 115, 22);
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "italic");
+    doc.text("Flow", x + 33, y + 8);
 
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("Visual & Digital", x + 25, y + 18);
+    // 4. Description line
+    doc.setTextColor(isDark ? 200 : 100);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text("COMUNICAÇÃO VISUAL • BRINDES • CONFECÇÃO", x + 15, y + 12);
 }
 
 export const generateQuotePDF = (order: Order, client?: Client) => {
@@ -124,14 +139,11 @@ export const generateOSPDF = (order: Order, client?: Client) => {
     doc.rect(0, 0, 210, 35, 'F');
 
     // Logo inside Dark Header
-    doc.setFillColor(249, 115, 22);
-    doc.roundedRect(14, 7, 20, 20, 4, 4, 'F');
-    doc.setTextColor(255);
-    doc.setFontSize(32);
-    doc.text("S", 24, 21, { align: "center" });
+    drawLogo(doc, 14, 10, true);
 
-    doc.setFontSize(20);
-    doc.text("ORDEM DE SERVIÇO", 105, 20, { align: "center" });
+    doc.setTextColor(255);
+    doc.setFontSize(18);
+    doc.text("ORDEM DE SERVIÇO", 196, 20, { align: "right" });
 
     doc.setTextColor(0);
     doc.setFontSize(12);
@@ -172,6 +184,7 @@ export const generateOSPDF = (order: Order, client?: Client) => {
 
     const finalY = (doc as any).lastAutoTable.finalY + 15;
     doc.rect(14, finalY, 180, 40);
+    doc.setFontSize(10);
     doc.text("Check de Qualidade / Observações Extras:", 16, finalY + 8);
 
     addSignatures(doc, finalY + 45);
@@ -211,7 +224,7 @@ export const generateDeliveryCertificate = (order: Order, client?: Client) => {
     doc.text("Assinatura do Recebedor", 105, y + 8, { align: "center" });
 
     doc.setFontSize(9);
-    doc.text(`SKV - Soluções em Comunicação Visual - Emitido em ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 280, { align: "center" });
+    doc.text(`SKV Flow - Emitido em ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 280, { align: "center" });
 
     return doc;
 };
