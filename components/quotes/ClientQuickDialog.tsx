@@ -14,6 +14,7 @@ import {
     DialogFooter
 } from "@/components/ui/dialog"
 import { UserPlus } from "lucide-react"
+import { v4 as uuidv4 } from "uuid"
 
 interface ClientQuickDialogProps {
     onClientCreated?: (clientId: string) => void;
@@ -38,6 +39,7 @@ export function ClientQuickDialog({ onClientCreated }: ClientQuickDialogProps) {
             return
         }
 
+        const newId = uuidv4();
         addClient({
             name,
             companyName: type === 'PJ' ? companyName : undefined,
@@ -46,7 +48,12 @@ export function ClientQuickDialog({ onClientCreated }: ClientQuickDialogProps) {
             email,
             type,
             origin,
-        })
+            id: newId
+        } as any)
+
+        if (onClientCreated) {
+            onClientCreated(newId);
+        }
 
         // Reset and close
         setName("")
@@ -58,7 +65,7 @@ export function ClientQuickDialog({ onClientCreated }: ClientQuickDialogProps) {
         setOrigin("WhatsApp")
         setOpen(false)
 
-        alert("Cliente cadastrado com sucesso! Selecione-o na lista.")
+        alert("Cliente cadastrado com sucesso!")
     }
 
     return (

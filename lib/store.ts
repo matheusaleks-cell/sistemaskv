@@ -237,7 +237,7 @@ export const useAppStore = create<AppState>()(
         {
             name: 'grafica-flow-storage',
             storage: createJSONStorage(() => localStorage),
-            skipHydration: true,
+            skipHydration: false,
             partialize: (state) => ({
                 users: state.users,
                 clients: state.clients,

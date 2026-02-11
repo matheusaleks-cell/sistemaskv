@@ -4,6 +4,8 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -16,9 +18,10 @@ model User {
 }
 
 model Client {
-  id        String   @id @default(uuid())
-  name      String
-  document  String?
+  id          String   @id @default(uuid())
+  name        String
+  companyName String?
+  document    String?
   email     String?
   phone     String?
   origin    String?

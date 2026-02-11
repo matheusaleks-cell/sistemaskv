@@ -209,7 +209,7 @@ export default function NewQuotePage() {
                                 <CardTitle className="text-xl font-bold">Dados do Cliente</CardTitle>
                                 <CardDescription>Selecione ou cadastre um novo cliente</CardDescription>
                             </div>
-                            <ClientQuickDialog />
+                            <ClientQuickDialog onClientCreated={(id) => setClientId(id)} />
                         </CardHeader>
                         <CardContent className="pt-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
