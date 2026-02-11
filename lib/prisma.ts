@@ -1,16 +1,21 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
 const prismaClientSingleton = () => {
-    // Prisma 7 requires explicit connection string configuration since schema won't have it
     const connectionString = process.env.DATABASE_URL
-    return new PrismaClient({
-        // @ts-ignore - 'datasources' is valid for overriding connection string
-        datasources: {
-            db: {
-                url: connectionString
-            }
-        }
+
+    if (!connectionString) {
+        console.warn('DATABASE_URL is not set')
+    }
+
+    const pool = new Pool({
+        connectionString,
+        ssl: connectionString?.includes('supabase') ? { rejectUnauthorized: false } : false
     })
+    const adapter = new PrismaPg(pool)
+
+    return new PrismaClient({ adapter })
 }
 
 declare global {
