@@ -73,13 +73,13 @@ export function LoginPage() {
                     <form onSubmit={handleLogin} className="space-y-6 text-left">
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="email" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email de Acesso</Label>
+                                <Label htmlFor="email" className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Nome de Usuário</Label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-3 h-4 w-4 text-slate-500" />
                                     <Input
                                         id="email"
-                                        type="email"
-                                        placeholder="seu@email.com"
+                                        type="text"
+                                        placeholder="Digite seu nome"
                                         className="pl-10 bg-slate-950/40 border-slate-800 text-slate-100 focus:border-orange-500 focus:ring-orange-500/20 h-11 transition-all rounded-xl"
                                         value={email}
                                         onChange={(e) => {
@@ -133,28 +133,7 @@ export function LoginPage() {
                         </Button>
                     </form>
 
-                    <div className="pt-6 border-t border-slate-800/50 grid grid-cols-2 gap-4">
-                        <div
-                            className="text-left cursor-pointer p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-800 group"
-                            onClick={() => {
-                                setEmail('wiliam@grafica.com')
-                                setPassword('Jojo!246040')
-                            }}
-                        >
-                            <p className="font-bold text-xs text-orange-400 mb-0.5">Wiliam</p>
-                            <p className="text-[10px] text-slate-500 group-hover:text-slate-300 transition-colors">wiliam@grafica.com</p>
-                        </div>
-                        <div
-                            className="text-left cursor-pointer p-3 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-800 group"
-                            onClick={() => {
-                                setEmail('amanda@atendimento.com')
-                                setPassword('Jojo!246040')
-                            }}
-                        >
-                            <p className="font-bold text-xs text-blue-400 mb-0.5">Amanda</p>
-                            <p className="text-[10px] text-slate-500 group-hover:text-slate-300 transition-colors">amanda@atendimento.com</p>
-                        </div>
-                    </div>
+
                 </div>
             </div>
         </div>

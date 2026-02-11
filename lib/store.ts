@@ -22,6 +22,8 @@ interface AppState {
     updateClient: (id: string, data: Partial<Client>) => void;
 
     addProduct: (product: Omit<Product, 'id'>) => void;
+    updateProduct: (id: string, data: Partial<Omit<Product, 'id'>>) => void;
+    deleteProduct: (id: string) => void;
 
     addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>) => void;
     addDirectOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status' | 'osNumber' | 'productionStart'>) => void;
@@ -43,8 +45,8 @@ export const useAppStore = create<AppState>()(
         (set, get) => ({
             currentUser: null,
             users: [
-                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: 'Jojo!246040' },
-                { id: '2', name: 'Amanda', email: 'amanda@atendimento.com', role: 'ATTENDANT', password: 'Jojo!246040' }
+                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: '12345' },
+                { id: '2', name: 'Matheus', email: 'matheus@suporte.com', role: 'MASTER', password: '211198' }
             ],
             clients: [],
             orders: [],
@@ -84,10 +86,10 @@ export const useAppStore = create<AppState>()(
                 enableQualityChecklist: false,
             },
 
-            login: async (email, password) => {
+            login: async (identifier, password) => {
                 try {
                     const { loginAction } = await import('@/lib/actions/auth');
-                    const result = await loginAction(email, password);
+                    const result = await loginAction(identifier, password);
 
                     if (result.success && result.user) {
                         set({ currentUser: result.user as User });
@@ -124,8 +126,16 @@ export const useAppStore = create<AppState>()(
                 clients: state.clients.map(c => c.id === id ? { ...c, ...data } : c)
             })),
 
-            addProduct: (productData) => set((state) => ({
+            addProduct: (productData: Omit<Product, 'id'>) => set((state) => ({
                 products: [...state.products, { ...productData, id: uuidv4() }]
+            })),
+
+            updateProduct: (id: string, data: Partial<Omit<Product, 'id'>>) => set((state) => ({
+                products: state.products.map(p => p.id === id ? { ...p, ...data } : p)
+            })),
+
+            deleteProduct: (id: string) => set((state) => ({
+                products: state.products.filter(p => p.id !== id)
             })),
 
             addOrder: (orderData) => {

@@ -17,22 +17,37 @@ const addSignatures = (doc: jsPDF, finalY: number) => {
     doc.text("Responsável SKV", 158, y + 5, { align: "center" });
 };
 
+const drawLogo = (doc: jsPDF, x: number, y: number) => {
+    // Background rectangle for the logo
+    doc.setFillColor(249, 115, 22); // Orange
+    doc.roundedRect(x, y, 20, 20, 4, 4, 'F');
+
+    // Logo Text "S"
+    doc.setTextColor(255, 255, 255); // White
+    doc.setFontSize(32);
+    doc.setFont("helvetica", "bold");
+    doc.text("S", x + 10, y + 14, { align: "center" });
+
+    // Company Name beside it
+    doc.setTextColor(30, 41, 59); // Dark slate
+    doc.setFontSize(24);
+    doc.text("SKV", x + 25, y + 12);
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Visual & Digital", x + 25, y + 18);
+}
+
 export const generateQuotePDF = (order: Order, client?: Client) => {
     const doc = new jsPDF();
 
-    // Header
-    doc.setFontSize(24);
-    doc.setTextColor(249, 115, 22); // Orange primary
-    doc.text("SKV", 14, 20);
-
-    doc.setFontSize(9);
-    doc.setTextColor(100);
-    doc.text("Soluções em Impressão Digital & Comunicação Visual", 14, 26);
+    // Header with Logo
+    drawLogo(doc, 14, 15);
 
     // Quote Info Box
     doc.setFillColor(248, 250, 252);
     doc.rect(140, 14, 56, 22, 'F');
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(30, 41, 59);
     doc.text(`ORÇAMENTO #${order.id.slice(0, 8).toUpperCase()}`, 142, 22);
     doc.setFontSize(9);
@@ -43,32 +58,32 @@ export const generateQuotePDF = (order: Order, client?: Client) => {
 
     // Client Info
     doc.setDrawColor(241, 245, 249);
-    doc.line(14, 40, 196, 40);
+    doc.line(14, 45, 196, 45);
 
     doc.setFontSize(11);
     doc.setTextColor(51, 65, 85);
-    doc.text("DADOS DO CLIENTE", 14, 48);
+    doc.text("DADOS DO CLIENTE", 14, 53);
 
     doc.setFontSize(10);
     doc.setTextColor(30, 41, 59);
-    doc.text(`Nome/Empresa: ${order.clientName}`, 14, 55);
+    doc.text(`Nome/Empresa: ${order.clientName}`, 14, 60);
     if (client) {
-        doc.text(`Doc: ${client.document || 'N/I'}`, 14, 60);
-        doc.text(`Tel: ${client.phone}`, 14, 65);
+        doc.text(`Doc: ${client.document || 'N/I'}`, 14, 65);
+        doc.text(`Tel: ${client.phone}`, 14, 70);
     }
 
     if (order.hasShipping) {
         doc.setFontSize(9);
         doc.setTextColor(100);
-        doc.text(`Endereço de Entrega: ${order.shippingAddress || 'A retirar'}`, 14, 72);
-        doc.text(`Frete: R$ ${order.shippingValue?.toFixed(2) || '0,00'}`, 14, 77);
+        doc.text(`Endereço de Entrega: ${order.shippingAddress || 'A retirar'}`, 14, 77);
+        doc.text(`Frete: R$ ${order.shippingValue?.toFixed(2) || '0,00'}`, 14, 82);
     }
 
     // Items Table
     const tableColumn = ["Item", "Produto", "Medidas", "Qtd", "Total"];
     const tableRows: any[] = [];
 
-    const tableStartY = order.hasShipping ? 82 : 70;
+    const tableStartY = order.hasShipping ? 87 : 75;
 
     order.items.forEach((item, index) => {
         tableRows.push([
@@ -106,24 +121,31 @@ export const generateOSPDF = (order: Order, client?: Client) => {
 
     // OS Header
     doc.setFillColor(30, 41, 59);
-    doc.rect(0, 0, 210, 30, 'F');
+    doc.rect(0, 0, 210, 35, 'F');
+
+    // Logo inside Dark Header
+    doc.setFillColor(249, 115, 22);
+    doc.roundedRect(14, 7, 20, 20, 4, 4, 'F');
     doc.setTextColor(255);
+    doc.setFontSize(32);
+    doc.text("S", 24, 21, { align: "center" });
+
     doc.setFontSize(20);
     doc.text("ORDEM DE SERVIÇO", 105, 20, { align: "center" });
 
     doc.setTextColor(0);
     doc.setFontSize(12);
-    doc.text(`OS #: ${order.osNumber || 'PENDENTE'}`, 14, 45);
-    doc.text(`Cliente: ${order.clientName}`, 14, 52);
+    doc.text(`OS #: ${order.osNumber || 'PENDENTE'}`, 14, 48);
+    doc.text(`Cliente: ${order.clientName}`, 14, 55);
 
-    if (client?.document) doc.text(`Doc: ${client.document}`, 14, 59);
-    if (client?.phone) doc.text(`WhatsApp: ${client.phone}`, 14, 66);
+    if (client?.document) doc.text(`Doc: ${client.document}`, 14, 62);
+    if (client?.phone) doc.text(`WhatsApp: ${client.phone}`, 14, 69);
 
     doc.setFontSize(11);
-    doc.text(`Prazo: ${order.deadline ? format(new Date(order.deadline), 'dd/MM/yyyy') : '-'}`, 140, 45);
-    doc.text(`Entrega: ${order.hasShipping ? 'SIM' : 'NÃO (RETIRA)'}`, 140, 52);
+    doc.text(`Prazo: ${order.deadline ? format(new Date(order.deadline), 'dd/MM/yyyy') : '-'}`, 140, 48);
+    doc.text(`Entrega: ${order.hasShipping ? 'SIM' : 'NÃO (RETIRA)'}`, 140, 55);
 
-    const lineY = 75;
+    const lineY = 78;
     doc.setDrawColor(200);
     doc.line(14, lineY, 196, lineY);
 
@@ -143,7 +165,7 @@ export const generateOSPDF = (order: Order, client?: Client) => {
     autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
-        startY: 85,
+        startY: 88,
         theme: 'grid',
         headStyles: { fillColor: [71, 85, 105] },
     });
@@ -160,14 +182,18 @@ export const generateOSPDF = (order: Order, client?: Client) => {
 export const generateDeliveryCertificate = (order: Order, client?: Client) => {
     const doc = new jsPDF();
 
-    doc.setFontSize(20);
+    // Header with Logo
+    drawLogo(doc, 14, 15);
+
+    doc.setFontSize(18);
     doc.setTextColor(30, 41, 59);
-    doc.text("COMPROVANTE DE ENTREGA", 105, 30, { align: "center" });
+    doc.text("COMPROVANTE DE ENTREGA", 110, 25, { align: "center" });
 
     doc.setDrawColor(249, 115, 22);
-    doc.line(40, 35, 170, 35);
+    doc.line(14, 40, 196, 40);
 
     doc.setFontSize(12);
+    doc.setTextColor(0);
     doc.text(`Confirmamos a entrega do pedido #${order.osNumber || order.id.slice(0, 8).toUpperCase()}`, 14, 55);
     doc.text(`Cliente: ${order.clientName}`, 14, 65);
     doc.text(`Data da Entrega: ${format(new Date(), 'dd/MM/yyyy')}`, 14, 75);
@@ -185,7 +211,7 @@ export const generateDeliveryCertificate = (order: Order, client?: Client) => {
     doc.text("Assinatura do Recebedor", 105, y + 8, { align: "center" });
 
     doc.setFontSize(9);
-    doc.text(`SKV - Impressão realizada em ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 280, { align: "center" });
+    doc.text(`SKV - Soluções em Comunicação Visual - Emitido em ${format(new Date(), 'dd/MM/yyyy HH:mm')}`, 105, 280, { align: "center" });
 
     return doc;
 };

@@ -2,13 +2,18 @@
 
 import prisma from '@/lib/prisma'
 
-export async function loginAction(email: string, password?: string) {
+export async function loginAction(identifier: string, password?: string) {
     console.log('--- LOGIN ATTEMPT ---');
-    console.log('Email provided:', email);
-    console.log('Password provided:', password);
+    console.log('Identifier provided:', identifier);
     try {
-        const user = await prisma.user.findUnique({
-            where: { email },
+        // Try to find by name first (requested Nome e Senha)
+        let user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { name: identifier },
+                    { email: identifier }
+                ]
+            }
         })
 
         if (!user) {
@@ -16,8 +21,7 @@ export async function loginAction(email: string, password?: string) {
             return { success: false, error: 'Credenciais inválidas' }
         }
 
-        console.log('User found:', user.email);
-        console.log('Database password:', user.password);
+        console.log('User found:', user.name);
 
         if (user.password === password) {
             console.log('Login SUCCESS');

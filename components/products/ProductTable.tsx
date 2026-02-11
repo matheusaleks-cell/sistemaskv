@@ -9,12 +9,21 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { useAppStore } from "@/lib/store"
+import { Button } from "@/components/ui/button"
+import { Edit2, Trash2 } from "lucide-react"
+import { ProductDialog } from "./ProductDialog"
 
 export function ProductTable() {
-    const { products } = useAppStore()
+    const { products, deleteProduct } = useAppStore()
 
     if (products.length === 0) {
         return <div className="p-8 text-center text-muted-foreground border rounded-lg bg-white/5">Nenhum produto cadastrado.</div>
+    }
+
+    const handleDelete = (id: string, name: string) => {
+        if (window.confirm(`Tem certeza que deseja excluir o produto "${name}"?`)) {
+            deleteProduct(id)
+        }
     }
 
     return (
@@ -24,7 +33,8 @@ export function ProductTable() {
                     <TableRow>
                         <TableHead>Nome do Produto</TableHead>
                         <TableHead>Preço Base</TableHead>
-                        <TableHead className="text-right">Prazo Padrão (Dias)</TableHead>
+                        <TableHead>Prazo Padrão</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -39,7 +49,28 @@ export function ProductTable() {
                                     ? `R$ ${product.price.toFixed(2)} /m²`
                                     : `R$ ${product.price.toFixed(2)} un.`}
                             </TableCell>
-                            <TableCell className="text-right">{product.defaultDays} dias</TableCell>
+                            <TableCell>{product.defaultDays} dias</TableCell>
+                            <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                    <ProductDialog
+                                        product={product}
+                                        trigger={
+                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50">
+                                                <Edit2 className="h-4 w-4" />
+                                            </Button>
+                                        }
+                                    />
+
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        onClick={() => handleDelete(product.id, product.name)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

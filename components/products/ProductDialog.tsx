@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAppStore } from "@/lib/store"
 import { Button } from "@/components/ui/button"
 import {
@@ -14,52 +14,77 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Product } from "@/types"
+import { Edit2 } from "lucide-react"
 
-export function ProductDialog() {
-    const { addProduct, currentUser } = useAppStore()
+interface ProductDialogProps {
+    product?: Product;
+    trigger?: React.ReactNode;
+}
+
+export function ProductDialog({ product, trigger }: ProductDialogProps) {
+    const { addProduct, updateProduct, currentUser } = useAppStore()
     const [open, setOpen] = useState(false)
 
-    // Allow both MASTER and ATTENDANT to add products, as requested.
-    if (!currentUser) return null;
+    const [name, setName] = useState(product?.name || "")
+    const [price, setPrice] = useState(product?.price.toString() || "")
+    const [minPrice, setMinPrice] = useState(product?.minPrice?.toString() || "")
+    const [defaultDays, setDefaultDays] = useState(product?.defaultDays.toString() || "")
+    const [category, setCategory] = useState<any>(product?.category || 'BANNER')
+    const [pricingType, setPricingType] = useState<any>(product?.pricingType || 'AREA')
 
-    const [name, setName] = useState("")
-    const [price, setPrice] = useState("")
-    const [minPrice, setMinPrice] = useState("")
-    const [defaultDays, setDefaultDays] = useState("")
-    const [category, setCategory] = useState<any>('BANNER')
-    const [pricingType, setPricingType] = useState<any>('AREA')
+    useEffect(() => {
+        if (open && product) {
+            setName(product.name)
+            setPrice(product.price.toString())
+            setMinPrice(product.minPrice?.toString() || "")
+            setDefaultDays(product.defaultDays.toString())
+            setCategory(product.category)
+            setPricingType(product.pricingType)
+        }
+    }, [open, product])
+
+    if (!currentUser) return null;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         if (!name || !price || !defaultDays) return
 
-        addProduct({
+        const productData = {
             name,
             price: parseFloat(price),
             minPrice: minPrice ? parseFloat(minPrice) : undefined,
             defaultDays: parseInt(defaultDays),
             category,
             pricingType
-        })
+        }
+
+        if (product) {
+            updateProduct(product.id, productData)
+        } else {
+            addProduct(productData)
+        }
 
         setOpen(false)
-        setName("")
-        setPrice("")
-        setMinPrice("")
-        setDefaultDays("")
-        setCategory("BANNER")
-        setPricingType("AREA")
+        if (!product) {
+            setName("")
+            setPrice("")
+            setMinPrice("")
+            setDefaultDays("")
+            setCategory("BANNER")
+            setPricingType("AREA")
+        }
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">Novo Produto</Button>
+                {trigger || <Button variant="outline">Novo Produto</Button>}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Adicionar Produto</DialogTitle>
+                        <DialogTitle>{product ? 'Editar Produto' : 'Adicionar Produto'}</DialogTitle>
                         <DialogDescription>
                             Defina as regras de precificação e categoria do produto.
                         </DialogDescription>
