@@ -11,9 +11,10 @@ export function KanbanBoard() {
 
     const columns: { id: OrderStatus, title: string, color: string }[] = [
         { id: 'QUOTE', title: 'Orçamentos', color: 'bg-zinc-100' },
+        { id: 'ART', title: 'Arte / Arquivos', color: 'bg-orange-50' },
         { id: 'APPROVED', title: 'Aprovados', color: 'bg-blue-50' },
-        { id: 'PRODUCTION', title: 'Em Produção', color: 'bg-yellow-50' },
-        { id: 'COMPLETED', title: 'Concluídos', color: 'bg-green-50' },
+        { id: 'PRODUCTION', title: 'Em Produção', color: 'bg-indigo-50' },
+        { id: 'COMPLETED', title: 'Concluídos', color: 'bg-emerald-50' },
         { id: 'DELIVERED', title: 'Entregues', color: 'bg-slate-100' },
     ]
 

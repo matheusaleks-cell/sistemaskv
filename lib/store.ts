@@ -181,11 +181,19 @@ export const useAppStore = create<AppState>()(
                     const updatedOrder = { ...updatedOrders[orderIndex] };
 
                     // Logic for transitions
-                    if (status === 'APPROVED' && updatedOrder.status === 'QUOTE') {
-                        updatedOrder.osNumber = `OS-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`;
+                    if ((status === 'ART' || status === 'APPROVED') && updatedOrder.status === 'QUOTE') {
+                        if (!updatedOrder.osNumber) {
+                            updatedOrder.osNumber = `OS-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+                        }
+                    }
+
+                    if (status === 'PRODUCTION' && !updatedOrder.productionStart) {
                         updatedOrder.productionStart = new Date().toISOString();
                     }
-                    if (status === 'COMPLETED') updatedOrder.finishedAt = new Date().toISOString();
+
+                    if (status === 'COMPLETED') {
+                        updatedOrder.finishedAt = new Date().toISOString();
+                    }
 
                     updatedOrder.status = status;
                     updatedOrders[orderIndex] = updatedOrder;

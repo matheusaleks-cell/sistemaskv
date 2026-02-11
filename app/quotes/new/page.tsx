@@ -23,7 +23,8 @@ import {
     Fingerprint,
     Search,
     Clock,
-    FileText
+    FileText,
+    AlertTriangle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { OrderItem } from "@/types"
@@ -383,7 +384,7 @@ export default function NewQuotePage() {
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6 pt-4 border-t border-slate-100/50">
-                                            <div className="md:col-span-9 space-y-2">
+                                            <div className="md:col-span-9 space-y-3">
                                                 <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Acabamento / Observações de Produção</Label>
                                                 <Input
                                                     placeholder="Ex: Refiling, Ilhós a cada 50cm, Verniz localizado..."
@@ -391,12 +392,36 @@ export default function NewQuotePage() {
                                                     onChange={e => updateItem(item.id!, 'finish', e.target.value)}
                                                     className="rounded-xl border-slate-100 h-11 bg-white"
                                                 />
+                                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                                    {["Refile", "Ilhós (4)", "Ilhós (50cm)", "Bainha", "Brilho", "Fosco", "Recorte"].map(tag => (
+                                                        <button
+                                                            key={tag}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const current = item.finish || "";
+                                                                const newValue = current ? `${current}, ${tag}` : tag;
+                                                                updateItem(item.id!, 'finish', newValue);
+                                                            }}
+                                                            className="text-[10px] font-bold bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-500 px-2 py-1 rounded-lg transition-all"
+                                                        >
+                                                            + {tag}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                             <div className="md:col-span-3 flex flex-col items-end justify-center">
                                                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Subtotal Item</span>
-                                                <span className="text-2xl font-black text-slate-800">
+                                                <span className={cn(
+                                                    "text-2xl font-black transition-colors",
+                                                    (item.totalPrice || 0) < 5 && (item.totalPrice || 0) > 0 ? "text-red-500 animate-pulse" : "text-slate-800"
+                                                )}>
                                                     R$ {(item.totalPrice || 0).toFixed(2)}
                                                 </span>
+                                                {(item.totalPrice || 0) < 5 && (item.totalPrice || 0) > 0 && (
+                                                    <span className="text-[9px] font-black text-red-500 uppercase flex items-center gap-1">
+                                                        <AlertTriangle className="h-2.5 w-2.5" /> Valor muito baixo!
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

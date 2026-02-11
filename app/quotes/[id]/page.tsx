@@ -25,6 +25,7 @@ import Link from "next/link"
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
     QUOTE: 'ORÇAMENTO',
+    ART: 'ARTE / ARQUIVOS',
     APPROVED: 'AGUARDANDO PROD.',
     PRODUCTION: 'EM PRODUÇÃO',
     COMPLETED: 'PRONTO / FINALIZADO',
@@ -33,10 +34,11 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 
 const STATUS_COLORS: Record<OrderStatus, string> = {
     QUOTE: 'bg-slate-500',
+    ART: 'bg-orange-500',
     APPROVED: 'bg-blue-500',
-    PRODUCTION: 'bg-orange-500',
+    PRODUCTION: 'bg-indigo-600',
     COMPLETED: 'bg-green-600',
-    DELIVERED: 'bg-indigo-600'
+    DELIVERED: 'bg-slate-900'
 };
 
 export default function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -118,8 +120,11 @@ Podemos prosseguir?`
         let confirmMsg = "";
 
         if (order.status === 'QUOTE') {
+            nextStatus = 'ART';
+            confirmMsg = "Enviar este orçamento para o setor de ARTE / ARQUIVOS?";
+        } else if (order.status === 'ART') {
             nextStatus = 'APPROVED';
-            confirmMsg = "Deseja APROVAR este orçamento e gerar a Ordem de Serviço?";
+            confirmMsg = "Arquivos conferidos? Aprovar este pedido para produção?";
         } else if (order.status === 'APPROVED') {
             nextStatus = 'PRODUCTION';
             confirmMsg = "Deseja iniciar a PRODUÇÃO deste pedido?";
@@ -156,20 +161,20 @@ Podemos prosseguir?`
                 </div>
 
                 <div className="md:ml-auto flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" onClick={handleWhatsApp} className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200">
+                    <Button variant="outline" size="sm" onClick={handleWhatsApp} className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 font-bold">
                         <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
                     </Button>
 
                     {order.status === 'QUOTE' ? (
-                        <Button size="sm" variant="outline" onClick={handlePrintQuote}>
+                        <Button size="sm" variant="outline" onClick={handlePrintQuote} className="font-bold">
                             <Printer className="mr-2 h-4 w-4" /> Imp. Orçamento
                         </Button>
                     ) : (
                         <>
-                            <Button size="sm" variant="outline" onClick={handlePrintOS}>
+                            <Button size="sm" variant="outline" onClick={handlePrintOS} className="font-bold">
                                 <Printer className="mr-2 h-4 w-4" /> Imp. O.S
                             </Button>
-                            <Button size="sm" variant="outline" onClick={handlePrintDelivery}>
+                            <Button size="sm" variant="outline" onClick={handlePrintDelivery} className="font-bold">
                                 <FileText className="mr-2 h-4 w-4" /> Comprovante
                             </Button>
                         </>
@@ -177,14 +182,17 @@ Podemos prosseguir?`
 
                     {order.status !== 'DELIVERED' && (
                         <Button onClick={advanceStep} className="bg-orange-600 hover:bg-orange-700 shadow-lg shadow-orange-600/20 font-bold uppercase tracking-wider px-6">
-                            {order.status === 'QUOTE' && <CheckCircle className="mr-2 h-4 w-4" />}
+                            {order.status === 'QUOTE' && <FileText className="mr-2 h-4 w-4" />}
+                            {order.status === 'ART' && <CheckCircle className="mr-2 h-4 w-4" />}
                             {order.status === 'APPROVED' && <Play className="mr-2 h-4 w-4" />}
                             {order.status === 'PRODUCTION' && <Check className="mr-2 h-4 w-4" />}
                             {order.status === 'COMPLETED' && <Truck className="mr-2 h-4 w-4" />}
-                            {order.status === 'QUOTE' ? 'Aprovar Pedido' :
-                                order.status === 'APPROVED' ? 'Iniciar Produção' :
-                                    order.status === 'PRODUCTION' ? 'Finalizar Produção' :
-                                        order.status === 'COMPLETED' ? 'Confirmar Entrega' : ''}
+
+                            {order.status === 'QUOTE' ? 'Enviar p/ Arte' :
+                                order.status === 'ART' ? 'Aprovar Pedido' :
+                                    order.status === 'APPROVED' ? 'Iniciar Produção' :
+                                        order.status === 'PRODUCTION' ? 'Finalizar Produção' :
+                                            order.status === 'COMPLETED' ? 'Confirmar Entrega' : ''}
                         </Button>
                     )}
                 </div>

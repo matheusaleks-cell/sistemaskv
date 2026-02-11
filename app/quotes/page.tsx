@@ -69,14 +69,16 @@ export default function QuotesPage() {
                                     <Badge variant={
                                         quote.status === 'APPROVED' ? 'default' :
                                             quote.status === 'QUOTE' ? 'secondary' :
-                                                quote.status === 'PRODUCTION' ? 'warning' :
-                                                    quote.status === 'COMPLETED' ? 'success' : 'outline'
-                                    }>
+                                                quote.status === 'ART' ? 'warning' :
+                                                    quote.status === 'PRODUCTION' ? 'warning' :
+                                                        quote.status === 'COMPLETED' ? 'success' : 'outline'
+                                    } className={quote.status === 'ART' ? "bg-orange-500 hover:bg-orange-600 text-white border-none" : ""}>
                                         {quote.status === 'QUOTE' ? 'ORÇAMENTO' :
-                                            quote.status === 'APPROVED' ? 'APROVADO' :
-                                                quote.status === 'PRODUCTION' ? 'EM PRODUÇÃO' :
-                                                    quote.status === 'COMPLETED' ? 'FINALIZADO' :
-                                                        quote.status === 'DELIVERED' ? 'ENTREGUE' : quote.status}
+                                            quote.status === 'ART' ? 'ARTE / ARQUIVOS' :
+                                                quote.status === 'APPROVED' ? 'APROVADO' :
+                                                    quote.status === 'PRODUCTION' ? 'EM PRODUÇÃO' :
+                                                        quote.status === 'COMPLETED' ? 'FINALIZADO' :
+                                                            quote.status === 'DELIVERED' ? 'ENTREGUE' : quote.status}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right">R$ {quote.total.toFixed(2)}</TableCell>

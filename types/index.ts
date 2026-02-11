@@ -59,7 +59,7 @@ export interface OrderItem {
     };
 }
 
-export type OrderStatus = 'QUOTE' | 'APPROVED' | 'PRODUCTION' | 'COMPLETED' | 'DELIVERED';
+export type OrderStatus = 'QUOTE' | 'ART' | 'APPROVED' | 'PRODUCTION' | 'COMPLETED' | 'DELIVERED';
 
 export interface Order {
     id: string;

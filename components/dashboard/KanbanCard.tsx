@@ -31,14 +31,16 @@ export function KanbanCard({ order, onMove }: KanbanCardProps) {
     }
 
     const nextStatusMap: Record<string, OrderStatus> = {
-        'QUOTE': 'APPROVED',
+        'QUOTE': 'ART',
+        'ART': 'APPROVED',
         'APPROVED': 'PRODUCTION',
         'PRODUCTION': 'COMPLETED',
         'COMPLETED': 'DELIVERED',
     };
 
     const prevStatusMap: Record<string, OrderStatus> = {
-        'APPROVED': 'QUOTE',
+        'ART': 'QUOTE',
+        'APPROVED': 'ART',
         'PRODUCTION': 'APPROVED',
         'COMPLETED': 'PRODUCTION',
         'DELIVERED': 'COMPLETED'
@@ -78,12 +80,12 @@ export function KanbanCard({ order, onMove }: KanbanCardProps) {
                     <Button variant="outline" size="sm" className="w-full text-xs h-7">Ver Detalhes</Button>
                 </Link>
 
-                <div className="flex justify-between pt-1">
+                <div className="flex justify-between items-center pt-1 border-t border-slate-50">
                     {prevStatusMap[order.status] && (
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6"
+                            className="h-7 w-7 text-slate-400 hover:text-slate-600"
                             onClick={() => onMove(order.id, prevStatusMap[order.status])}
                         >
                             <ArrowLeft className="w-3 h-3" />
@@ -92,11 +94,15 @@ export function KanbanCard({ order, onMove }: KanbanCardProps) {
                     <div className="flex-1" />
                     {nextStatusMap[order.status] && (
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
+                            variant="secondary"
+                            size="sm"
+                            className="h-7 text-[10px] font-bold px-3 flex items-center gap-1 bg-white hover:bg-slate-50 border shadow-xs text-slate-700"
                             onClick={() => onMove(order.id, nextStatusMap[order.status])}
                         >
+                            {order.status === 'QUOTE' ? 'P/ Arte' :
+                                order.status === 'ART' ? 'Aprovar' :
+                                    order.status === 'APPROVED' ? 'Produzir' :
+                                        order.status === 'PRODUCTION' ? 'Finalizar' : 'Entregar'}
                             <ArrowRight className="w-3 h-3" />
                         </Button>
                     )}
