@@ -8,13 +8,13 @@ async function main() {
             name: 'Wiliam',
             email: 'wiliam@grafica.com',
             role: 'MASTER',
-            password: '12345'
+            password: 'Jojo!246040'
         },
         {
             name: 'Amanda',
             email: 'amanda@atendimento.com',
             role: 'ATTENDANT',
-            password: '12345'
+            password: 'Jojo!246040'
         }
     ]
 

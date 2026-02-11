@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CheckCircle2, User, KeyRound, Bug } from "lucide-react"
-import { testDatabaseConnection } from "@/lib/actions/debug"
 
 export function LoginPage() {
     const { login } = useAppStore()
@@ -14,37 +13,47 @@ export function LoginPage() {
     const [password, setPassword] = useState("")
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(false)
-    const [debugMode, setDebugMode] = useState(false)
-    const [debugResult, setDebugResult] = useState<any>(null)
-
-    const runDebug = async () => {
-        setDebugMode(true)
-        const result = await testDatabaseConnection()
-        setDebugResult(result)
-    }
+    const [errorMessage, setErrorMessage] = useState("")
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
         setError(false)
+        setErrorMessage("")
 
-        const success = await login(email, password)
-        if (!success) {
+        try {
+            const { loginAction } = await import('@/lib/actions/auth');
+            const result = await loginAction(email, password);
+
+            if (result.success && result.user) {
+                // The store login function also sets the user, but we can do it here if needed
+                // actually loginAction is just a server action. 
+                // We should use the store's login to maintain consistency
+                const success = await login(email, password);
+                if (!success) {
+                    setError(true)
+                    setErrorMessage("Erro ao salvar sessão local")
+                }
+            } else {
+                setError(true)
+                setErrorMessage(result.error || "Credenciais inválidas")
+            }
+        } catch (err: any) {
             setError(true)
+            setErrorMessage("Erro de servidor: " + err.message)
+        } finally {
             setLoading(false)
         }
     }
 
     return (
         <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-slate-900 font-sans">
-            {/* Animated Background Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                 <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-orange-600/10 blur-[120px] animate-pulse" />
                 <div className="absolute top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-blue-600/10 blur-[100px] animate-pulse delay-1000" />
                 <div className="absolute -bottom-[20%] left-[20%] w-[50%] h-[50%] rounded-full bg-emerald-500/5 blur-[100px] animate-pulse delay-2000" />
             </div>
 
-            {/* Glass Card */}
             <div className="relative z-10 w-full max-w-md p-8 m-4">
                 <div className="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 shadow-2xl" />
 
@@ -103,7 +112,7 @@ export function LoginPage() {
                         {error && (
                             <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold flex items-center justify-center animate-in fade-in slide-in-from-top-1">
                                 <KeyRound className="w-3.5 h-3.5 mr-2" />
-                                Credenciais inválidas. Verifique os dados.
+                                {errorMessage}
                             </div>
                         )}
 
@@ -146,29 +155,6 @@ export function LoginPage() {
                             <p className="text-[10px] text-slate-500 group-hover:text-slate-300 transition-colors">amanda@atendimento.com</p>
                         </div>
                     </div>
-
-                    {/* Debug Button */}
-                    <div className="pt-4">
-                        <Button
-                            type="button"
-                            onClick={runDebug}
-                            className="w-full h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold text-xs rounded-xl"
-                        >
-                            <Bug className="mr-2 h-4 w-4" /> Testar Conexão com Banco
-                        </Button>
-                    </div>
-
-                    {/* Debug Result */}
-                    {debugMode && debugResult && (
-                        <div className={`mt-4 p-4 rounded-xl border text-left ${debugResult.success ? 'bg-emerald-500/10 border-emerald-500/50' : 'bg-red-500/10 border-red-500/50'}`}>
-                            <p className={`font-bold text-sm mb-2 ${debugResult.success ? 'text-emerald-400' : 'text-red-400'}`}>
-                                {debugResult.success ? '✅ Conexão OK' : '❌ Erro de Conexão'}
-                            </p>
-                            <pre className="text-xs text-slate-300 overflow-auto max-h-40 bg-black/30 p-2 rounded">
-                                {JSON.stringify(debugResult, null, 2)}
-                            </pre>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

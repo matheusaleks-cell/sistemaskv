@@ -43,8 +43,8 @@ export const useAppStore = create<AppState>()(
         (set, get) => ({
             currentUser: null,
             users: [
-                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: '12345' },
-                { id: '2', name: 'Amanda', email: 'amanda@atendimento.com', role: 'ATTENDANT', password: '12345' }
+                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: 'Jojo!246040' },
+                { id: '2', name: 'Amanda', email: 'amanda@atendimento.com', role: 'ATTENDANT', password: 'Jojo!246040' }
             ],
             clients: [],
             orders: [],

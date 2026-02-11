@@ -3,16 +3,24 @@
 import prisma from '@/lib/prisma'
 
 export async function loginAction(email: string, password?: string) {
-    console.log('Login attempt for:', email);
+    console.log('--- LOGIN ATTEMPT ---');
+    console.log('Email provided:', email);
+    console.log('Password provided:', password);
     try {
         const user = await prisma.user.findUnique({
             where: { email },
         })
 
-        console.log('User found in DB:', user ? 'Yes' : 'No');
+        if (!user) {
+            console.log('Login failed: User NOT found in database');
+            return { success: false, error: 'Credenciais inválidas' }
+        }
 
-        if (user && user.password === password) {
-            console.log('Login successful for:', email);
+        console.log('User found:', user.email);
+        console.log('Database password:', user.password);
+
+        if (user.password === password) {
+            console.log('Login SUCCESS');
             return {
                 success: true,
                 user: {
@@ -24,11 +32,11 @@ export async function loginAction(email: string, password?: string) {
             }
         }
 
-        console.log('Login failed: Invalid credentials');
+        console.log('Login failed: Password mismatch');
         return { success: false, error: 'Credenciais inválidas' }
-    } catch (error) {
-        console.error('Login error in server action:', error)
-        return { success: false, error: 'Erro no servidor' }
+    } catch (error: any) {
+        console.error('Login CRITICAL error:', error.message)
+        return { success: false, error: 'Erro no servidor: ' + error.message }
     }
 }
 
