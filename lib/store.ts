@@ -48,8 +48,8 @@ export const useAppStore = create<AppState>()(
         (set, get) => ({
             currentUser: null,
             users: [
-                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: '123456' },
-                { id: '2', name: 'Matheus', email: 'matheus@suporte.com', role: 'MASTER', password: '211198' }
+                { id: '1', name: 'Wiliam', email: 'wiliam@grafica.com', role: 'MASTER', password: 'Jojo!246040' },
+                { id: '2', name: 'Amanda', email: 'amanda@atendimento.com', role: 'ATTENDANT', password: 'Jojo!246040' }
             ],
             clients: [],
             orders: [],
@@ -318,6 +318,7 @@ export const useAppStore = create<AppState>()(
             storage: createJSONStorage(() => localStorage),
             skipHydration: false,
             partialize: (state) => ({
+                currentUser: state.currentUser,
                 users: state.users,
                 clients: state.clients,
                 orders: state.orders,

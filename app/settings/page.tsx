@@ -19,37 +19,41 @@ export default function SettingsPage() {
             <div>
                 <h2 className="text-2xl font-bold tracking-tight">Configurações</h2>
                 <p className="text-muted-foreground">
-                    Gerencie produtos, usuários e preferências do sistema.
+                    Gerencie as preferências do sistema SKV Flow.
                 </p>
             </div>
 
-            <Tabs defaultValue="users" className="space-y-4">
-                <TabsList>
-                    <TabsTrigger value="users">Usuários</TabsTrigger>
-                    <TabsTrigger value="system">Sistema</TabsTrigger>
-                </TabsList>
-                <TabsContent value="users">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Gestão de Usuários</CardTitle>
-                            <CardDescription>Lista de usuários com acesso ao sistema.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm text-muted-foreground">Funcionalidade simplificada para esta demonstração.</p>
-                            <div className="mt-4 space-y-2">
-                                <div className="p-4 border rounded flex justify-between items-center">
-                                    <span>Master Admin (master@admin.com)</span>
-                                    <span className="px-2 py-1 bg-primary text-primary-foreground text-xs rounded">MASTER</span>
-                                </div>
-                                <div className="p-4 border rounded flex justify-between items-center">
-                                    <span>Atendente (atendente@admin.com)</span>
-                                    <span className="px-2 py-1 bg-secondary text-secondary-foreground text-xs rounded">ATTENDANT</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+            <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
+                <CardHeader>
+                    <CardTitle>Preferências do Sistema</CardTitle>
+                    <CardDescription>Configure como o sistema deve se comportar.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <Label>Habilitar Módulo Financeiro</Label>
+                            <p className="text-xs text-muted-foreground">Mostra resumos de faturamento e fluxo de caixa.</p>
+                        </div>
+                        <Switch
+                            checked={settings.enableFinancial}
+                            onCheckedChange={(checked) => updateSettings({ enableFinancial: checked })}
+                        />
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                            <Label>Checklist de Qualidade</Label>
+                            <p className="text-xs text-muted-foreground">Exige conferência de itens antes de finalizar a produção.</p>
+                        </div>
+                        <Switch
+                            checked={settings.enableQualityChecklist}
+                            onCheckedChange={(checked) => updateSettings({ enableQualityChecklist: checked })}
+                        />
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }
