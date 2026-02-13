@@ -4,14 +4,16 @@ import prisma from '@/lib/prisma'
 import { Client } from '@/types'
 
 export async function getClientsAction() {
+    console.log('--- GET CLIENTS ACTION ---');
     try {
         const clients = await prisma.client.findMany({
             orderBy: { createdAt: 'desc' }
         })
+        console.log(`Success: Found ${clients.length} clients`);
         return { success: true, clients }
-    } catch (error) {
-        console.error('Fetch clients error:', error)
-        return { success: false, error: 'Erro ao buscar clientes' }
+    } catch (error: any) {
+        console.error('Fetch clients CRITICAL error:', error.message)
+        return { success: false, error: 'Erro ao buscar clientes: ' + error.message }
     }
 }
 

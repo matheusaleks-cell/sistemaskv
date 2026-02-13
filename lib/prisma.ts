@@ -5,8 +5,11 @@ import { Pool } from 'pg'
 const prismaClientSingleton = () => {
     const connectionString = process.env.DATABASE_URL
 
-    if (!connectionString) {
-        console.warn('DATABASE_URL is not set')
+    if (connectionString) {
+        const host = connectionString.split('@')[1]?.split('/')[0] || 'unknown';
+        console.log(`[Prisma] Inicializando conexão com host: ${host.replace(/.*(?=\.)/, '***')}`);
+    } else {
+        console.error('[Prisma] DATABASE_URL não encontrada no ambiente!');
     }
 
     const pool = new Pool({

@@ -19,43 +19,66 @@ export async function testDatabaseConnection() {
             return false;
         }
 
+        let pool;
         try {
-            const client = new PrismaClient({
-                datasources: { db: { url } }
+            // Test with direct pg first to verify network
+            const { Pool } = await import('pg');
+            const { PrismaPg } = await import('@prisma/adapter-pg');
+
+            pool = new Pool({
+                connectionString: url,
+                connectionTimeoutMillis: 10000,
+                ssl: url.includes('supabase') ? { rejectUnauthorized: false } : false
             });
+
+            // Try a quick query
+            const res = await pool.query('SELECT NOW()');
+            results.steps.push(`✅ ${name}: Database Network OK. Time: ${res.rows[0].now}`);
+
+            // Now test with Prisma and the same adapter pattern the app uses
+            const adapter = new PrismaPg(pool);
+            const client = new PrismaClient({ adapter });
+
             const count = await client.user.count();
             await client.$disconnect();
-            results.steps.push(`✅ ${name}: SUCCESS! Count: ${count}`);
+
+            results.steps.push(`✅ ${name}: Prisma connected! Users: ${count}`);
             return true;
         } catch (e: any) {
             results.steps.push(`❌ ${name}: Failed. Error: ${e.message}`);
             return false;
+        } finally {
+            if (pool) {
+                try {
+                    await pool.end();
+                } catch (err) { }
+            }
         }
     }
 
-    // 1. Test configured DATABASE_URL (Transaction Pooler - 6543)
+    // 1. Test configured DATABASE_URL
     const dbUrl = process.env.DATABASE_URL || '';
-    if (await tryConnection('DATABASE_URL (Transaction Mode)', dbUrl)) {
+    if (await tryConnection('DATABASE_URL (Main)', dbUrl)) {
         return { success: true, message: 'DATABASE_URL connected successfully!', workingUrlType: 'DATABASE_URL', steps: results.steps };
     }
 
-    // 2. Test configured DIRECT_URL (Direct Mode - 5432)
+    // 2. Test configured DIRECT_URL
     const directUrl = process.env.DIRECT_URL || '';
-    if (await tryConnection('DIRECT_URL (Direct Mode)', directUrl)) {
+    if (await tryConnection('DIRECT_URL (Direct)', directUrl)) {
         return { success: true, message: 'DIRECT_URL connected successfully!', workingUrlType: 'DIRECT_URL', steps: results.steps };
     }
 
-    // 3. Construct Session Mode
+    // 3. Construct Pooler URL manually for fallback check
     try {
-        const poolerHost = 'aws-0-sa-east-1.pooler.supabase.com';
-        const pass = 'Jojo%21246040'; // Escaped password
-        const sessionUrl = `postgresql://postgres.ptjvgmgivptnxmmsupot:${pass}@${poolerHost}:5432/postgres`;
+        const pass = 'Jojo%21246040';
+        const projectRef = 'pgviebosymajwqcucljd';
+        const sessionUrl = `postgresql://postgres.${projectRef}:${pass}@aws-0-sa-east-1.pooler.supabase.com:5432/postgres`;
 
-        if (await tryConnection('Session Mode (Pooler Host:5432)', sessionUrl)) {
-            return { success: true, message: 'Session Mode connected successfully!', workingUrlType: 'SESSION_MODE', steps: results.steps };
+        if (await tryConnection('Manual Pooler (5432)', sessionUrl)) {
+            return { success: true, message: 'Manual connection successful!', workingUrlType: 'MANUAL', steps: results.steps };
         }
     } catch (e) {
-        results.steps.push('Failed to construct session URL');
+        results.steps.push('Failed to construct manual URL');
     }
 
     return {
