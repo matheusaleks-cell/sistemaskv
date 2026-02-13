@@ -23,12 +23,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { currentUser } = useAppStore();
+  const { currentUser, hydrate } = useAppStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (currentUser) {
+      hydrate();
+    }
+  }, [currentUser]);
 
   return (
     <html lang="en" suppressHydrationWarning>

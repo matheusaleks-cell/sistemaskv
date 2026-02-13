@@ -135,7 +135,7 @@ export default function NewQuotePage() {
         return itemsTotal + (hasShipping ? shippingValue : 0);
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!clientId) {
             alert("Selecione um cliente");
             return;
@@ -173,7 +173,7 @@ export default function NewQuotePage() {
             });
         }
 
-        addOrder({
+        const success = await addOrder({
             clientId: client.id,
             clientName: client.name,
             items: validItems,
@@ -183,7 +183,11 @@ export default function NewQuotePage() {
             shippingValue: hasShipping ? shippingValue : 0
         });
 
-        router.push("/quotes");
+        if (success) {
+            router.push("/quotes");
+        } else {
+            alert("Erro ao salvar o pedido no banco de dados.");
+        }
     }
 
     return (

@@ -1,0 +1,92 @@
+
+const fs = require('fs');
+const content = `generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String   @unique
+  password  String   @default("12345")
+  role      String
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id          String   @id @default(uuid())
+  name        String
+  companyName String?
+  document    String?
+  email     String?
+  phone     String?
+  origin    String?
+  type      String   @default("PF")
+  createdAt DateTime @default(now())
+  orders    Order[]
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  osNumber        String?     @unique
+  clientId        String
+  clientName      String
+  total           Float
+  status          String
+  createdAt       DateTime    @default(now())
+  validUntil      DateTime?
+  productionStart DateTime?
+  deadline        DateTime?
+  finishedAt      DateTime?
+  hasShipping     Boolean     @default(false)
+  shippingAddress String?
+  shippingValue   Float?      @default(0)
+  client          Client      @relation(fields: [clientId], references: [id])
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id          String  @id @default(uuid())
+  orderId     String
+  productId   String?
+  productName String
+  width       Float
+  height      Float
+  quantity    Int
+  unitPrice   Float
+  totalPrice  Float
+  finish      String?
+  costs       Json?
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model FinancialRecord {
+  id          String    @id @default(uuid())
+  type        String
+  description String
+  amount      Float
+  dueDate     DateTime
+  paidDate    DateTime?
+  status      String
+  category    String?
+  orderId     String?
+  createdAt   DateTime  @default(now())
+}
+
+model Log {
+  id       String   @id @default(uuid())
+  date     DateTime @default(now())
+  action   String
+  details  String
+  userId   String
+  userName String
+}
+`;
+fs.writeFileSync('prisma/schema.prisma', content, 'utf8');
+console.log('File written in UTF-8');

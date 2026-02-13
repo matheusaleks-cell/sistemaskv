@@ -1,0 +1,25 @@
+﻿Using URL: postgresql://postgres:Jojo%21246040@db.pgviebosymajwqcucljd.supabase.co:5432/postgres
+Found 10 clients
+ID: ce610d6e-4f55-433f-9bba-63ab9aeb4e1c, Name: Cliente Fake 1, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: 136e0c08-21fe-47cf-b7b9-980463b63e51, Name: Cliente Fake 2, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: c9734fa7-8144-4027-acee-30e4a6f13e3d, Name: Cliente Fake 3, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: f8e790b2-5448-4a45-bd6f-21fd82dfc3e6, Name: Cliente Fake 4, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: 1541bec1-47cd-449d-b8a6-45ab3c2a0b7e, Name: Cliente Fake 5, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: ffb1b98e-d1c2-4ce3-b95c-0f15c6a46618, Name: Cliente Fake 6, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: bce2dbb0-dd5c-49e6-a550-75f7d00ce33f, Name: Cliente Fake 7, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: 99d43afb-e818-4a66-9d64-f4d0fafcab58, Name: Cliente Fake 8, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: 0f757e38-e09a-4fd4-a74e-4dbc1ceb255e, Name: Cliente Fake 9, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+ID: e5d6f7c8-46f1-4136-8591-79a1301ca5eb, Name: Cliente Fake 10, CreatedAt: Fri Feb 13 2026 10:13:13 GMT-0300 (Hor├írio Padr├úo de Bras├¡lia)
+Found 12 users
+ID: 2, Name: Matheus
+ID: 1, Name: Wiliam
+ID: ef5dcdea-7a3d-4019-b938-7ab858c8a062, Name: Usuario Fake 1
+ID: 0149e69c-9fc3-42fa-9a71-6e4fc760f73c, Name: Usuario Fake 2
+ID: 79a0669e-0edf-45d7-ae8c-18a9c86d2c5a, Name: Usuario Fake 3
+ID: 8c1da55c-a4c1-4f9c-b042-30b75023e1d8, Name: Usuario Fake 4
+ID: 4a4ff069-305c-4058-8cfe-160160877c3c, Name: Usuario Fake 5
+ID: 1c5bcdaf-4233-4e89-864e-b8729f08e45b, Name: Usuario Fake 6
+ID: 6e741f51-3738-46ad-90cc-ae6a5fbd1444, Name: Usuario Fake 7
+ID: 36e0182d-dc60-4a18-adc0-5cbf5f36aa06, Name: Usuario Fake 8
+ID: eacbde23-0586-464e-a182-00064a6cf380, Name: Usuario Fake 9
+ID: 7a8b3fbb-1ed8-4b12-a952-91ed7468438b, Name: Usuario Fake 10

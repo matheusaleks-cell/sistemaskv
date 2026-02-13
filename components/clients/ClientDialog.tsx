@@ -48,7 +48,7 @@ export function ClientDialog() {
             return
         }
 
-        addClient({
+        const success = await addClient({
             name,
             companyName,
             document,
@@ -59,8 +59,12 @@ export function ClientDialog() {
         })
 
         setLoading(false)
-        setOpen(false)
-        resetForm()
+        if (success) {
+            setOpen(false)
+            resetForm()
+        } else {
+            alert("Erro ao cadastrar cliente no banco de dados. Verifique a conexão.")
+        }
     }
 
     const resetForm = () => {

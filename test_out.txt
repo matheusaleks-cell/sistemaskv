@@ -1,0 +1,1 @@
+﻿Testing with URL: postgresql://postgres:Jojo%21246040@db.pgviebosymajwqcucljd.supabase.co:5432/postgres
