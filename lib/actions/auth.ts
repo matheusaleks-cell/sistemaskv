@@ -56,3 +56,44 @@ export async function updatePasswordAction(userId: string, newPassword: string) 
         return { success: false }
     }
 }
+
+export async function getUsersAction() {
+    try {
+        const users = await prisma.user.findMany({
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true
+            }
+        });
+        return { success: true, users };
+    } catch (error) {
+        console.error('Get users error:', error);
+        return { success: false };
+    }
+}
+
+export async function createUserAction(data: { name: string, email: string, role: string, password?: string }) {
+    try {
+        const user = await prisma.user.create({
+            data: {
+                ...data,
+                password: data.password || '123456'
+            }
+        });
+        return {
+            success: true,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
+        };
+    } catch (error: any) {
+        console.error('Create user error:', error);
+        return { success: false, error: error.message };
+    }
+}

@@ -17,6 +17,7 @@ interface AppState {
     login: (email: string, password?: string) => Promise<boolean>;
     logout: () => void;
     updatePassword: (userId: string, newPassword: string) => Promise<boolean>;
+    addUser: (user: Omit<User, 'id'>) => Promise<boolean>;
 
     // Database Sync
     hydrate: () => Promise<void>;
@@ -121,14 +122,34 @@ export const useAppStore = create<AppState>()(
                 return false;
             },
 
+            addUser: async (userData) => {
+                try {
+                    const { createUserAction } = await import('@/lib/actions/auth');
+                    const result = await createUserAction(userData as any);
+
+                    if (result.success && result.user) {
+                        set(state => ({
+                            users: [result.user as User, ...state.users]
+                        }));
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Add user error:', error);
+                    return false;
+                }
+            },
+
             hydrate: async () => {
                 try {
                     const { getClientsAction } = await import('@/lib/actions/clients');
                     const { getOrdersAction } = await import('@/lib/actions/orders');
+                    const { getUsersAction } = await import('@/lib/actions/auth');
 
-                    const [clientsRes, ordersRes] = await Promise.all([
+                    const [clientsRes, ordersRes, usersRes] = await Promise.all([
                         getClientsAction(),
-                        getOrdersAction()
+                        getOrdersAction(),
+                        getUsersAction()
                     ]);
 
                     if (clientsRes.success && clientsRes.clients) {
@@ -146,6 +167,9 @@ export const useAppStore = create<AppState>()(
                             finishedAt: o.finishedAt instanceof Date ? o.finishedAt.toISOString() : o.finishedAt,
                         }));
                         set({ orders });
+                    }
+                    if (usersRes?.success && usersRes.users) {
+                        set({ users: usersRes.users as User[] });
                     }
                 } catch (error) {
                     console.error('Hydrate error:', error);
