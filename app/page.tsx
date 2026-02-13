@@ -21,14 +21,53 @@ export default function Home() {
     alert(JSON.stringify(result, null, 2))
   }
 
-  // Calculate real stats
+  // Calculate real stats and trends
+  const now = new Date()
+  const currentMonth = now.getMonth()
+  const currentYear = now.getFullYear()
+
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear
+
+  const ordersCM = orders.filter(o => {
+    const d = new Date(o.createdAt)
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+  })
+
+  const ordersPM = orders.filter(o => {
+    const d = new Date(o.createdAt)
+    return d.getMonth() === lastMonth && d.getFullYear() === lastMonthYear
+  })
+
+  const calculateTrend = (cmValue: number, pmValue: number) => {
+    if (pmValue === 0) return cmValue > 0 ? "+100%" : "+0%";
+    const trend = ((cmValue - pmValue) / pmValue) * 100;
+    return `${trend >= 0 ? '+' : ''}${trend.toFixed(0)}%`;
+  }
+
   const stats = {
     quotes: orders.filter(o => o.status === 'QUOTE').length,
+    quotesTrend: calculateTrend(
+      ordersCM.filter(o => o.status === 'QUOTE').length,
+      ordersPM.filter(o => o.status === 'QUOTE').length
+    ),
     production: orders.filter(o => ['APPROVED', 'PRODUCTION'].includes(o.status)).length,
+    productionTrend: calculateTrend(
+      ordersCM.filter(o => ['APPROVED', 'PRODUCTION'].includes(o.status)).length,
+      ordersPM.filter(o => ['APPROVED', 'PRODUCTION'].includes(o.status)).length
+    ),
     completed: orders.filter(o => o.status === 'COMPLETED').length,
+    completedTrend: calculateTrend(
+      ordersCM.filter(o => o.status === 'COMPLETED').length,
+      ordersPM.filter(o => o.status === 'COMPLETED').length
+    ),
     revenue: currentUser?.role === 'MASTER'
       ? orders.filter(o => o.status !== 'QUOTE').reduce((acc, curr) => acc + curr.total, 0)
-      : undefined
+      : undefined,
+    revenueTrend: calculateTrend(
+      ordersCM.filter(o => o.status !== 'QUOTE').reduce((acc, curr) => acc + curr.total, 0),
+      ordersPM.filter(o => o.status !== 'QUOTE').reduce((acc, curr) => acc + curr.total, 0)
+    )
   }
 
   return (

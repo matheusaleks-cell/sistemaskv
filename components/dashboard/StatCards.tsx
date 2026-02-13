@@ -6,9 +6,13 @@ import { FileText, Printer, CheckCircle2, TrendingUp, DollarSign } from "lucide-
 interface StatCardsProps {
     stats: {
         quotes: number;
+        quotesTrend: string;
         production: number;
+        productionTrend: string;
         completed: number;
+        completedTrend: string;
         revenue?: number;
+        revenueTrend?: string;
     }
 }
 
@@ -20,7 +24,7 @@ export function StatCards({ stats }: StatCardsProps) {
             icon: FileText,
             color: "text-orange-500",
             bg: "bg-orange-50",
-            trend: "+12%"
+            trend: stats.quotesTrend
         },
         {
             label: "Em Produção",
@@ -28,7 +32,7 @@ export function StatCards({ stats }: StatCardsProps) {
             icon: Printer,
             color: "text-blue-500",
             bg: "bg-blue-50",
-            trend: "+5%"
+            trend: stats.productionTrend
         },
         {
             label: "Prontos para Entrega",
@@ -36,7 +40,7 @@ export function StatCards({ stats }: StatCardsProps) {
             icon: CheckCircle2,
             color: "text-emerald-500",
             bg: "bg-emerald-50",
-            trend: "+18%"
+            trend: stats.completedTrend
         }
     ]
 
@@ -47,7 +51,7 @@ export function StatCards({ stats }: StatCardsProps) {
             icon: DollarSign,
             color: "text-indigo-600",
             bg: "bg-indigo-50",
-            trend: "+24%"
+            trend: stats.revenueTrend || "+0%"
         } as any)
     }
 
