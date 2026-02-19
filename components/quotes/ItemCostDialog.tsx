@@ -86,7 +86,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 rounded-lg border-orange-200 text-orange-600 hover:bg-orange-50 gap-2">
+                <Button variant="outline" size="sm" className="rounded-full border-orange-200 text-orange-600 hover:bg-orange-50 gap-2 px-4 py-1 h-auto text-xs font-bold uppercase tracking-wide">
                     <Calculator className="h-3.5 w-3.5" /> Composição de Custo
                 </Button>
             </DialogTrigger>
