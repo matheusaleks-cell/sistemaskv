@@ -54,6 +54,7 @@ export interface OrderItem {
         collarCost?: number;
         sewingCost?: number;
         bagCost?: number;
+        otherCost?: number;
         shippingCost?: number;
         markupPercent?: number;
     };
@@ -76,7 +77,9 @@ export interface Order {
     finishedAt?: string;
     hasShipping: boolean;
     shippingAddress?: string;
+    shippingType?: string;
     shippingValue?: number;
+    needsArt?: boolean;
 }
 
 export interface Log {

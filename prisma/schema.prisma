@@ -42,7 +42,9 @@ model Order {
   finishedAt      DateTime?
   hasShipping     Boolean     @default(false)
   shippingAddress String?
+  shippingType    String?
   shippingValue   Float?      @default(0)
+  needsArt        Boolean     @default(true)
   client          Client      @relation(fields: [clientId], references: [id])
   items           OrderItem[]
 }

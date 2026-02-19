@@ -23,6 +23,7 @@ interface CostBreakdown {
     collarCost: number;
     sewingCost: number;
     bagCost: number;
+    otherCost: number;
     shippingCost: number;
     markupPercent: number;
 }
@@ -34,6 +35,7 @@ interface ItemCostDialogProps {
 }
 
 export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDialogProps) {
+    const [open, setOpen] = useState(false)
     const [costs, setCosts] = useState<CostBreakdown>({
         taxPercent: initialCosts?.taxPercent ?? 13,
         itemCost: initialCosts?.itemCost ?? 0,
@@ -43,6 +45,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
         collarCost: initialCosts?.collarCost ?? 0,
         sewingCost: initialCosts?.sewingCost ?? 0,
         bagCost: initialCosts?.bagCost ?? 0,
+        otherCost: initialCosts?.otherCost ?? 0,
         shippingCost: initialCosts?.shippingCost ?? 0,
         markupPercent: initialCosts?.markupPercent ?? 30,
     })
@@ -63,7 +66,9 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
             costs.silkCost +
             costs.collarCost +
             costs.sewingCost +
+            costs.sewingCost +
             costs.bagCost +
+            costs.otherCost +
             (costs.shippingCost / (quantity || 1));
 
         const costWithTax = totalBaseCost * (1 + (costs.taxPercent / 100));
@@ -79,7 +84,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
     const result = calculateResult()
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="h-8 rounded-lg border-orange-200 text-orange-600 hover:bg-orange-50 gap-2">
                     <Calculator className="h-3.5 w-3.5" /> Composição de Custo
@@ -104,7 +109,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
                                         type="number"
                                         value={costs.taxPercent}
                                         onChange={handleChange}
-                                        className="pl-9 h-9 rounded-xl"
+                                        className="pl-9 h-9 rounded-xl border-slate-200 bg-white"
                                     />
                                 </div>
                             </div>
@@ -117,7 +122,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
                                         type="number"
                                         value={costs.markupPercent}
                                         onChange={handleChange}
-                                        className="pl-9 h-9 rounded-xl border-orange-200 focus:ring-orange-500"
+                                        className="pl-9 h-9 rounded-xl border-orange-200 focus:ring-orange-500 bg-white"
                                     />
                                 </div>
                             </div>
@@ -136,6 +141,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
                                     { label: 'Gola', name: 'collarCost' },
                                     { label: 'Costura', name: 'sewingCost' },
                                     { label: 'Saquinho', name: 'bagCost' },
+                                    { label: 'Outros Custos', name: 'otherCost' },
                                     { label: 'Frete Total', name: 'shippingCost' },
                                 ].map((field) => (
                                     <div key={field.name} className="space-y-1.5">
@@ -147,7 +153,7 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
                                                 type="number"
                                                 value={(costs as any)[field.name]}
                                                 onChange={handleChange}
-                                                className="pl-8 h-8 rounded-lg text-xs"
+                                                className="pl-8 h-8 rounded-lg text-xs border-slate-200 bg-white focus:border-orange-500 focus:ring-orange-500"
                                             />
                                         </div>
                                     </div>
@@ -199,7 +205,10 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
 
                 <DialogFooter>
                     <Button
-                        onClick={() => onApply(result.finalPrice, costs)}
+                        onClick={() => {
+                            onApply(result.finalPrice, costs);
+                            setOpen(false);
+                        }}
                         className="w-full bg-slate-900 text-white hover:bg-slate-800 rounded-xl h-12 font-bold"
                     >
                         Aplicar Preço no Orçamento

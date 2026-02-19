@@ -19,12 +19,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 // import { Separator } from "@/components/ui/separator"
 
 import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog"
+import { Switch } from "@/components/ui/switch"
+import {
     Trash, Plus, Calculator, Building2,
     Fingerprint,
     Search,
     Clock,
     FileText,
-    AlertTriangle
+    AlertTriangle,
+    Truck,
+    Car,
+    Bike,
+    Palette
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { OrderItem } from "@/types"
@@ -39,7 +52,11 @@ export default function NewQuotePage() {
     const [clientId, setClientId] = useState("")
     const [hasShipping, setHasShipping] = useState(false)
     const [shippingAddress, setShippingAddress] = useState("")
+    const [shippingType, setShippingType] = useState("CAR")
     const [shippingValue, setShippingValue] = useState(0)
+    const [needsArt, setNeedsArt] = useState(true)
+    const [showPrintDialog, setShowPrintDialog] = useState(false)
+    const [savedOrderId, setSavedOrderId] = useState<string | null>(null)
 
     const [items, setItems] = useState<Partial<OrderItem>[]>([
         { id: uuidv4(), width: 0, height: 0, quantity: 1, unitPrice: 0, totalPrice: 0 }
@@ -178,13 +195,17 @@ export default function NewQuotePage() {
             clientName: client.name,
             items: validItems,
             total: getTotal(),
+            status: needsArt ? 'QUOTE' : 'APPROVED', // Skip art if not needed (logic to be refined manually if needed/approved)
             hasShipping,
             shippingAddress,
-            shippingValue: hasShipping ? shippingValue : 0
+            shippingType,
+            shippingValue: hasShipping ? shippingValue : 0,
+            needsArt
         });
 
-        if (success) {
-            router.push("/quotes");
+        if (success && success.order) {
+            setSavedOrderId(success.order.id)
+            setShowPrintDialog(true)
         } else {
             alert("Erro ao salvar o pedido no banco de dados.");
         }
@@ -232,6 +253,24 @@ export default function NewQuotePage() {
                                         </SelectContent>
                                     </Select>
                                 </div>
+                                <div className="space-y-4 md:col-span-1 pt-6">
+                                    <div className="flex items-center space-x-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                                        <div className="bg-purple-100 p-2 rounded-xl text-purple-600">
+                                            <Palette className="h-4 w-4" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <Label htmlFor="needs-art" className="text-sm font-bold text-slate-700 cursor-pointer">
+                                                Cliente precisa de arte?
+                                            </Label>
+                                            <p className="text-[10px] text-slate-400">Se não, avança para produção</p>
+                                        </div>
+                                        <Switch
+                                            id="needs-art"
+                                            checked={needsArt}
+                                            onCheckedChange={setNeedsArt}
+                                        />
+                                    </div>
+                                </div>
                                 <div className="space-y-4 md:col-span-2">
                                     <div className="flex items-center gap-2 mb-2">
                                         <button
@@ -251,7 +290,7 @@ export default function NewQuotePage() {
                                     </div>
 
                                     {hasShipping && (
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-top-2 duration-300">
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-in slide-in-from-top-2 duration-300 pt-2">
                                             <div className="md:col-span-2 space-y-2">
                                                 <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Endereço de Entrega</Label>
                                                 <Input
@@ -262,13 +301,27 @@ export default function NewQuotePage() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Valor do Frete (R$)</Label>
+                                                <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Tipo</Label>
+                                                <Select value={shippingType} onValueChange={setShippingType}>
+                                                    <SelectTrigger className="h-12 rounded-2xl border-slate-100 bg-slate-50/50">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="CAR"><div className="flex items-center gap-2"><Car className="h-4 w-4" /> Carro</div></SelectItem>
+                                                        <SelectItem value="MOTO"><div className="flex items-center gap-2"><Bike className="h-4 w-4" /> Moto</div></SelectItem>
+                                                        <SelectItem value="TRUCK"><div className="flex items-center gap-2"><Truck className="h-4 w-4" /> Caminhão</div></SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Valor (R$)</Label>
                                                 <Input
                                                     type="number"
+                                                    disabled={!shippingAddress}
                                                     placeholder="0,00"
                                                     value={shippingValue || ''}
                                                     onChange={(e) => setShippingValue(parseFloat(e.target.value) || 0)}
-                                                    className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 focus:border-orange-500 focus:ring-orange-500"
+                                                    className="h-12 rounded-2xl border-slate-100 bg-slate-50/50 focus:border-orange-500 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 />
                                             </div>
                                         </div>
@@ -362,7 +415,7 @@ export default function NewQuotePage() {
                                                     type="number"
                                                     value={item.quantity || ''}
                                                     onChange={e => updateItem(item.id!, 'quantity', parseFloat(e.target.value))}
-                                                    className="rounded-xl border-slate-100 h-11 bg-white px-2"
+                                                    className="rounded-xl border-slate-300 h-11 bg-white px-2 font-bold text-center text-lg focus:border-orange-500 focus:ring-orange-500"
                                                 />
                                             </div>
 
@@ -483,6 +536,33 @@ export default function NewQuotePage() {
                     </div>
                 </div>
             </div>
-        </div>
+            <Dialog open={showPrintDialog} onOpenChange={setShowPrintDialog}>
+                <DialogContent className="sm:max-w-md rounded-3xl">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                            <FileText className="h-6 w-6 text-orange-500" /> Pedido Concluído!
+                        </DialogTitle>
+                        <DialogDescription className="text-slate-500">
+                            O pedido foi salvo com sucesso. Deseja imprimir o orçamento agora?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex gap-2 sm:justify-center">
+                        <Button
+                            variant="secondary"
+                            onClick={() => router.push('/quotes')}
+                            className="flex-1 rounded-xl h-12 font-bold"
+                        >
+                            Não, voltar
+                        </Button>
+                        <Button
+                            onClick={() => router.push(`/quotes/${savedOrderId}/print`)}
+                            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-xl h-12 font-bold shadow-lg shadow-orange-500/20"
+                        >
+                            Sim, Imprimir
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div >
     )
 }

@@ -30,7 +30,9 @@ export async function createOrderAction(data: any) {
                 status: data.status,
                 hasShipping: data.hasShipping || false,
                 shippingAddress: data.shippingAddress,
+                shippingType: data.shippingType,
                 shippingValue: data.shippingValue,
+                needsArt: data.needsArt !== undefined ? data.needsArt : true,
                 items: {
                     create: data.items.map((item: any) => ({
                         productId: item.productId,
