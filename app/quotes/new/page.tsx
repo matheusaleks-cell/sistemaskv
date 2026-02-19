@@ -383,7 +383,7 @@ export default function NewQuotePage() {
                                             </div>
 
                                             {isArea ? (
-                                                <div className="md:col-span-4 grid grid-cols-2 gap-3">
+                                                <div className="md:col-span-3 grid grid-cols-2 gap-3">
                                                     <div className="space-y-2">
                                                         <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Largura (cm)</Label>
                                                         <Input
@@ -404,12 +404,12 @@ export default function NewQuotePage() {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="md:col-span-4 flex items-center justify-center text-[11px] text-slate-300 font-bold uppercase tracking-widest h-full pt-6">
+                                                <div className="md:col-span-3 flex items-center justify-center text-[11px] text-slate-300 font-bold uppercase tracking-widest h-full pt-6">
                                                     Sem dimensões
                                                 </div>
                                             )}
 
-                                            <div className="md:col-span-1 space-y-2">
+                                            <div className="md:col-span-2 space-y-2">
                                                 <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Qtd</Label>
                                                 <Input
                                                     type="number"
