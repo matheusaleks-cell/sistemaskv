@@ -415,7 +415,7 @@ export default function NewQuotePage() {
                                                     type="number"
                                                     value={item.quantity || ''}
                                                     onChange={e => updateItem(item.id!, 'quantity', parseFloat(e.target.value))}
-                                                    className="rounded-xl border-slate-300 h-11 bg-white px-2 font-bold text-center text-lg focus:border-orange-500 focus:ring-orange-500"
+                                                    className="rounded-xl border-slate-300 h-11 bg-white px-2 font-bold text-center text-lg focus:border-orange-500 focus:ring-orange-500 w-full min-w-[80px]"
                                                 />
                                             </div>
 
