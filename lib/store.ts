@@ -223,100 +223,96 @@ export const useAppStore = create<AppState>()(
                     const { createOrderAction } = await import('@/lib/actions/orders');
                     const fullOrderData = {
                         ...orderData,
-                        const fullOrderData = {
-                            ...orderData,
-                            status: orderData.status || 'QUOTE',
-                            hasShipping: orderData.hasShipping || false,
-                            shippingAddress: orderData.shippingAddress || '',
-                            shippingValue: orderData.shippingValue || 0,
-                        };
+                        status: orderData.status || 'QUOTE',
+                        hasShipping: orderData.hasShipping || false,
+                        shippingAddress: orderData.shippingAddress || '',
+                        shippingValue: orderData.shippingValue || 0,
+                    };
 
-                        const result = await createOrderAction(fullOrderData);
+                    const result = await createOrderAction(fullOrderData);
 
-                        if(result.success && result.order) {
-        const newOrder = {
-            ...(result.order as any),
-            createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
-            items: orderData.items // Re-attach items since create return might be missing them if not included
-        } as Order;
-        set(state => ({ orders: [newOrder, ...state.orders] }));
-await get().logAction('CRIAR_ORCAMENTO', `Criou orçamento para ${newOrder.clientName}`, get().currentUser!);
-set(state => ({ orders: [newOrder, ...state.orders] }));
-await get().logAction('CRIAR_ORCAMENTO', `Criou orçamento para ${newOrder.clientName}`, get().currentUser!);
-return { success: true, order: newOrder };
+                    if (result.success && result.order) {
+                        const newOrder = {
+                            ...(result.order as any),
+                            createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
+                            items: orderData.items // Re-attach items since create return might be missing them if not included
+                        } as Order;
+                        set(state => ({ orders: [newOrder, ...state.orders] }));
+                        await get().logAction('CRIAR_ORCAMENTO', `Criou orçamento para ${newOrder.clientName}`, get().currentUser!);
+                        return { success: true, order: newOrder };
                     }
-return { success: false };
+                    return { success: false };
                 } catch (error) {
-    console.error('Add order error:', error);
-    return { success: false };
-}
+                    console.error('Add order error:', error);
+                    return { success: false };
+                }
             },
 
-addDirectOrder: async (orderData) => {
-    try {
-        const { createOrderAction } = await import('@/lib/actions/orders');
-        const fullOrderData = {
-            ...orderData,
-            status: 'PRODUCTION',
-            osNumber: `OS-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
-            productionStart: new Date().toISOString(),
-            hasShipping: orderData.hasShipping || false,
-            shippingAddress: orderData.shippingAddress || '',
-            shippingValue: orderData.shippingValue || 0,
-        };
+            addDirectOrder: async (orderData) => {
+                try {
+                    const { createOrderAction } = await import('@/lib/actions/orders');
+                    const fullOrderData = {
+                        ...orderData,
+                        status: 'PRODUCTION',
+                        osNumber: `OS-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000)}`,
+                        productionStart: new Date().toISOString(),
+                        hasShipping: orderData.hasShipping || false,
+                        shippingAddress: orderData.shippingAddress || '',
+                        shippingValue: orderData.shippingValue || 0,
+                    };
 
-        const result = await createOrderAction(fullOrderData);
+                    const result = await createOrderAction(fullOrderData);
 
-        if (result.success && result.order) {
-            const newOrder = {
-                ...(result.order as any),
-                createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
-                productionStart: (result.order as any).productionStart instanceof Date ? (result.order as any).productionStart.toISOString() : (result.order as any).productionStart,
-                items: orderData.items
-            } as Order;
-            set(state => ({ orders: [newOrder, ...state.orders] }));
-            await get().logAction('CRIAR_PEDIDO_DIRETO', `Criou pedido direto para ${newOrder.clientName}`, get().currentUser!);
-            return true;
-        }
-        return false;
-    } catch (error) {
-        console.error('Add direct order error:', error);
-        return false;
-    }
-},
+                    if (result.success && result.order) {
+                        const newOrder = {
+                            ...(result.order as any),
+                            createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
+                            productionStart: (result.order as any).productionStart instanceof Date ? (result.order as any).productionStart.toISOString() : (result.order as any).productionStart,
+                            items: orderData.items
+                        } as Order;
+                        set(state => ({ orders: [newOrder, ...state.orders] }));
+                        await get().logAction('CRIAR_PEDIDO_DIRETO', `Criou pedido direto para ${newOrder.clientName}`, get().currentUser!);
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Add direct order error:', error);
+                    return false;
+                }
+            },
 
-    updateOrderStatus: async (id, status, user) => {
-        try {
-            const { updateOrderStatusAction } = await import('@/lib/actions/orders');
-            const result = await updateOrderStatusAction(id, status);
+            updateOrderStatus: async (id, status, user) => {
+                try {
+                    const { updateOrderStatusAction } = await import('@/lib/actions/orders');
+                    const result = await updateOrderStatusAction(id, status);
 
-            if (result.success && result.order) {
-                const updatedOrder = {
-                    ...(result.order as any),
-                    createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
-                    productionStart: (result.order as any).productionStart instanceof Date ? (result.order as any).productionStart.toISOString() : (result.order as any).productionStart,
-                    finishedAt: (result.order as any).finishedAt instanceof Date ? (result.order as any).finishedAt.toISOString() : (result.order as any).finishedAt,
-                } as Order;
+                    if (result.success && result.order) {
+                        const updatedOrder = {
+                            ...(result.order as any),
+                            createdAt: (result.order as any).createdAt instanceof Date ? (result.order as any).createdAt.toISOString() : (result.order as any).createdAt,
+                            productionStart: (result.order as any).productionStart instanceof Date ? (result.order as any).productionStart.toISOString() : (result.order as any).productionStart,
+                            finishedAt: (result.order as any).finishedAt instanceof Date ? (result.order as any).finishedAt.toISOString() : (result.order as any).finishedAt,
+                        } as Order;
 
-                set(state => ({
-                    orders: state.orders.map(o => o.id === id ? { ...o, ...updatedOrder } : o)
-                }));
-                await get().logAction('MUDAR_STATUS', `Pedido ${id} para ${status}`, user);
-                return true;
-            }
-            return false;
-        } catch (error) {
-            console.error('Update order status error:', error);
-            return false;
-        }
-    },
+                        set(state => ({
+                            orders: state.orders.map(o => o.id === id ? { ...o, ...updatedOrder } : o)
+                        }));
+                        await get().logAction('MUDAR_STATUS', `Pedido ${id} para ${status}`, user);
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Update order status error:', error);
+                    return false;
+                }
+            },
 
-        addFinancialRecord: (recordData) => set((state) => ({
-            financialRecords: [
-                ...state.financialRecords,
-                { ...recordData, id: uuidv4(), createdAt: new Date().toISOString() }
-            ]
-        })),
+            addFinancialRecord: (recordData) => set((state) => ({
+                financialRecords: [
+                    ...state.financialRecords,
+                    { ...recordData, id: uuidv4(), createdAt: new Date().toISOString() }
+                ]
+            })),
 
             updateFinancialStatus: (id, status, paidDate) => set((state) => ({
                 financialRecords: state.financialRecords.map(r =>
@@ -324,37 +320,37 @@ addDirectOrder: async (orderData) => {
                 )
             })),
 
-                updateSettings: (newSettings) => set((state) => ({
-                    settings: { ...state.settings, ...newSettings }
-                })),
+            updateSettings: (newSettings) => set((state) => ({
+                settings: { ...state.settings, ...newSettings }
+            })),
 
-                    logAction: (action, details, user) => set(state => ({
-                        logs: [...state.logs, {
-                            id: uuidv4(),
-                            date: new Date(),
-                            userId: user.id,
-                            userName: user.name,
-                            action,
-                            details
-                        }]
-                    })),
+            logAction: (action, details, user) => set(state => ({
+                logs: [...state.logs, {
+                    id: uuidv4(),
+                    date: new Date(),
+                    userId: user.id,
+                    userName: user.name,
+                    action,
+                    details
+                }]
+            })),
 
-                        getOrdersByStatus: (status) => get().orders.filter(o => o.status === status)
+            getOrdersByStatus: (status) => get().orders.filter(o => o.status === status)
         }),
-{
-    name: 'grafica-flow-storage',
-        storage: createJSONStorage(() => localStorage),
+        {
+            name: 'grafica-flow-storage',
+            storage: createJSONStorage(() => localStorage),
             skipHydration: false,
-                partialize: (state) => ({
-                    currentUser: state.currentUser,
-                    users: state.users,
-                    clients: state.clients,
-                    orders: state.orders,
-                    products: state.products,
-                    financialRecords: state.financialRecords,
-                    logs: state.logs,
-                    settings: state.settings
-                }),
+            partialize: (state) => ({
+                currentUser: state.currentUser,
+                users: state.users,
+                clients: state.clients,
+                orders: state.orders,
+                products: state.products,
+                financialRecords: state.financialRecords,
+                logs: state.logs,
+                settings: state.settings
+            }),
         }
     )
 );
