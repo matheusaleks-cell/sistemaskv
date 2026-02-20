@@ -431,7 +431,8 @@ export default function NewQuotePage() {
                                                     />
                                                     <ItemCostDialog
                                                         quantity={item.quantity || 1}
-                                                        product={product} // Pass product to dialog or handle here
+                                                        product={product}
+                                                        currentUnitPrice={item.unitPrice}
                                                         initialCosts={item.costs}
                                                         onApply={(price, costs) => {
                                                             let finalPrice = price;
