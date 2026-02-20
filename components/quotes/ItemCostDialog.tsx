@@ -28,13 +28,16 @@ interface CostBreakdown {
     markupPercent: number;
 }
 
+import { Product } from "@/types"
+
 interface ItemCostDialogProps {
     onApply: (unitPrice: number, costs: CostBreakdown) => void;
     initialCosts?: Partial<CostBreakdown>;
     quantity: number;
+    product?: Product;
 }
 
-export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDialogProps) {
+export function ItemCostDialog({ onApply, initialCosts, quantity, product }: ItemCostDialogProps) {
     const [open, setOpen] = useState(false)
     const [costs, setCosts] = useState<CostBreakdown>({
         taxPercent: initialCosts?.taxPercent ?? 13,
@@ -164,20 +167,26 @@ export function ItemCostDialog({ onApply, initialCosts, quantity }: ItemCostDial
 
                     <div className="space-y-6 flex flex-col justify-center">
                         <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 space-y-4">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-slate-500 font-medium">Custo Base (+Tax):</span>
-                                <span className="font-bold text-slate-700">R$ {result.unitCost.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className="text-slate-500 font-medium">Lucro Unitário:</span>
-                                <span className="font-bold text-green-600">R$ {result.profit.toFixed(2)}</span>
-                            </div>
-                            <div className="h-px bg-slate-200" />
-                            <div className="flex flex-col items-center py-2">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Preço Final Sugerido</span>
-                                <span className="text-3xl font-black text-orange-600">
-                                    R$ {result.finalPrice.toFixed(2)}
-                                </span>
+                            <div className="pt-4 border-t border-slate-100/50 space-y-3">
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500 font-medium">Custo Total (sem margem)</span>
+                                    <span className="font-bold text-slate-700">R$ {result.unitCost.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-slate-500 font-medium">Lucro Estimado</span>
+                                    <span className="font-bold text-green-600">R$ {result.profit.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-2">
+                                    <span className="text-lg font-bold text-slate-800">Preço Final Sugerido</span>
+                                    <div className="text-right">
+                                        <span className="text-2xl font-extrabold text-orange-600">R$ {result.finalPrice.toFixed(2)}</span>
+                                        {product?.minPrice && (result.finalPrice * quantity) < product.minPrice && (
+                                            <p className="text-[10px] font-bold text-red-500 mt-1">
+                                                Abaixo do Mínimo (R$ {product.minPrice.toFixed(2)})
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

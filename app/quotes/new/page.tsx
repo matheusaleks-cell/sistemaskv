@@ -431,9 +431,22 @@ export default function NewQuotePage() {
                                                     />
                                                     <ItemCostDialog
                                                         quantity={item.quantity || 1}
+                                                        product={product} // Pass product to dialog or handle here
                                                         initialCosts={item.costs}
                                                         onApply={(price, costs) => {
-                                                            setItems(prev => prev.map(i => i.id === item.id ? { ...i, unitPrice: price, costs: costs, totalPrice: price * (i.quantity || 1) } : i))
+                                                            let finalPrice = price;
+                                                            if (product && product.minPrice) {
+                                                                const calculatedTotal = finalPrice * (item.quantity || 1);
+                                                                if (calculatedTotal < product.minPrice) {
+                                                                    finalPrice = product.minPrice / (item.quantity || 1);
+                                                                }
+                                                            }
+                                                            // Fix floating point
+                                                            finalPrice = Number(finalPrice.toFixed(2));
+
+                                                            updateItem(item.id!, 'unitPrice', finalPrice); // use updateItem for consistency
+                                                            // We also need to save costs, updateItem might need to handle it or we set it directly
+                                                            setItems(prev => prev.map(i => i.id === item.id ? { ...i, unitPrice: finalPrice, costs: costs, totalPrice: Number((finalPrice * (i.quantity || 1)).toFixed(2)) } : i))
                                                         }}
                                                     />
                                                 </div>
