@@ -1,4 +1,7 @@
-generator client {
+const fs = require('fs');
+const path = require('path');
+
+const schema = `generator client {
   provider = "prisma-client-js"
 }
 
@@ -97,3 +100,7 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+`.replace(/\n/g, '\r\n');
+
+fs.writeFileSync(path.join(__dirname, 'prisma', 'schema.prisma'), schema, 'utf8');
+console.log('schema.prisma written successfully');

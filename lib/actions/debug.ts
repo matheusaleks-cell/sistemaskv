@@ -1,9 +1,9 @@
 'use server'
 
-import { PrismaClient } from '@prisma/client'
+import { Pool } from 'pg'
 
 export async function testDatabaseConnection() {
-    console.log('--- DEBUG: Advanced Connection Test ---');
+    console.log('--- DEBUG: Connection Test (PG Native) ---');
 
     const results = {
         steps: [] as string[],
@@ -21,10 +21,6 @@ export async function testDatabaseConnection() {
 
         let pool;
         try {
-            // Test with direct pg first to verify network
-            const { Pool } = await import('pg');
-            const { PrismaPg } = await import('@prisma/adapter-pg');
-
             pool = new Pool({
                 connectionString: url,
                 connectionTimeoutMillis: 10000,
@@ -35,14 +31,11 @@ export async function testDatabaseConnection() {
             const res = await pool.query('SELECT NOW()');
             results.steps.push(`✅ ${name}: Database Network OK. Time: ${res.rows[0].now}`);
 
-            // Now test with Prisma and the same adapter pattern the app uses
-            const adapter = new PrismaPg(pool);
-            const client = new PrismaClient({ adapter });
+            // Test User count (Native SQL)
+            const countRes = await pool.query('SELECT COUNT(*) FROM "User"');
+            const count = countRes.rows[0].count;
 
-            const count = await client.user.count();
-            await client.$disconnect();
-
-            results.steps.push(`✅ ${name}: Prisma connected! Users: ${count}`);
+            results.steps.push(`✅ ${name}: Query OK! Users: ${count}`);
             return true;
         } catch (e: any) {
             results.steps.push(`❌ ${name}: Failed. Error: ${e.message}`);
@@ -66,19 +59,6 @@ export async function testDatabaseConnection() {
     const directUrl = process.env.DIRECT_URL || '';
     if (await tryConnection('DIRECT_URL (Direct)', directUrl)) {
         return { success: true, message: 'DIRECT_URL connected successfully!', workingUrlType: 'DIRECT_URL', steps: results.steps };
-    }
-
-    // 3. Construct Pooler URL manually for fallback check
-    try {
-        const pass = 'Jojo%21246040';
-        const projectRef = 'pgviebosymajwqcucljd';
-        const sessionUrl = `postgresql://postgres.${projectRef}:${pass}@aws-0-sa-east-1.pooler.supabase.com:5432/postgres`;
-
-        if (await tryConnection('Manual Pooler (5432)', sessionUrl)) {
-            return { success: true, message: 'Manual connection successful!', workingUrlType: 'MANUAL', steps: results.steps };
-        }
-    } catch (e) {
-        results.steps.push('Failed to construct manual URL');
     }
 
     return {
